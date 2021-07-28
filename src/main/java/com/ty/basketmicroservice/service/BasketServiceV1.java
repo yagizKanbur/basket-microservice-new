@@ -48,14 +48,16 @@ public class BasketServiceV1 implements BasketService {
 
     @Override
     public Basket removeItem(ItemRequest request) {
-        return null;
+        Basket basket = getBasketOrElseThrow(request.getBasketId());
+        basket.getItems().remove(request.getProductId());
+        return basketRepository.save(basket);
     }
 
     @Override
     public Basket checkOrUncheckItem(ItemRequest request) {
         Basket basket = getBasketOrElseThrow(request.getBasketId());
         basket.getItems().get(request.getProductId()).changeCheckBox();
-        return null;
+        return basketRepository.save(basket);
     }
 
     @Override

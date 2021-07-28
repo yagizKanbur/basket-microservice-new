@@ -51,6 +51,10 @@ public class Basket {
         }
     }
 
+    public void addItem(BasketItem item){
+        items.putIfAbsent(item.getProductId(), item);
+    }
+
     public UUID getId() {
         return id;
     }
