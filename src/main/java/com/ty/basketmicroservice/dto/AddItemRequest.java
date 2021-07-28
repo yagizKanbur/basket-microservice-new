@@ -3,6 +3,7 @@ package com.ty.basketmicroservice.dto;
 import java.util.UUID;
 
 public class AddItemRequest {
+    private UUID basketId;
     private UUID sessionId;
     private UUID productId;
     private String productImage;
@@ -10,6 +11,14 @@ public class AddItemRequest {
     private Double productPrice;
 
     public AddItemRequest() {
+    }
+
+    public UUID getBasketId() {
+        return basketId;
+    }
+
+    public void setBasketId(UUID basketId) {
+        this.basketId = basketId;
     }
 
     public UUID getSessionId() {

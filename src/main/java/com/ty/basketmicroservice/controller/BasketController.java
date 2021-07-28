@@ -1,12 +1,16 @@
 package com.ty.basketmicroservice.controller;
 
+import com.ty.basketmicroservice.domain.Basket;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
 import com.ty.basketmicroservice.service.BasketService;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.awt.desktop.PreferencesEvent;
 
 @RestController
 @RequestMapping("/basket")
@@ -17,32 +21,39 @@ public class BasketController {
         this.basketService = basketService;
     }
 
-    public void addItem (AddItemRequest request){
-        // Todo: Add Item Return Cart
+    public ResponseEntity<Basket> addItem (AddItemRequest request){
+        // Todo:Control of the request
+        return ResponseEntity.ok(basketService.addItem(request));
     }
 
-    public void removeItem(ItemRequest request){
-        // Todo: Remove Item Return Cart
+    public ResponseEntity<Basket> removeItem(ItemRequest request){
+        // Todo:Control of the request
+        return ResponseEntity.ok(basketService.removeItem(request));
     }
 
-    public void increaseQuantity(ChangeQuantityRequest request){
-        // Todo: Increase quantity of an item
+    public ResponseEntity<Basket> increaseQuantity(ChangeQuantityRequest request){
+        // Todo:Control of the request
+        return ResponseEntity.ok(basketService.increaseQuantity(request));
     }
 
-    public void decreaseQuantity(ChangeQuantityRequest request){
-        // Todo: Decrease quantity of an item
+    public ResponseEntity<Basket> decreaseQuantity(ChangeQuantityRequest request){
+        // Todo:Control of the request
+        return ResponseEntity.ok(basketService.decreaseQuantity(request));
     }
 
-    public void changeQuantity(ChangeQuantityRequest request){
-        // Todo: change quantity of an item to the given number
+    public ResponseEntity<Basket> changeQuantity(ChangeQuantityRequest request){
+        // Todo:Control of the request
+        return ResponseEntity.ok(basketService.changeQuantity(request));
     }
 
-    public void checkItem(ItemRequest request){
-        // check checkbox for an given item
+    public ResponseEntity<Basket> checkItem(ItemRequest request){
+        // Todo:Control of the request
+        return ResponseEntity.ok(basketService.checkItem(request));
     }
 
-    public void uncheckItem(ItemRequest request){
-        // uncheck checkbox for given item
+    public ResponseEntity<Basket> uncheckItem(ItemRequest request){
+        // Todo:Control of the request
+        return ResponseEntity.ok(basketService.uncheckItem(request));
     }
 
     public void completeOrder(){
