@@ -1,11 +1,15 @@
 package com.ty.basketmicroservice.service;
 
 import com.ty.basketmicroservice.domain.Basket;
+import com.ty.basketmicroservice.domain.BasketItem;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
 import com.ty.basketmicroservice.repository.BasketRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class BasketServiceV1 implements BasketService {
@@ -18,17 +22,23 @@ public class BasketServiceV1 implements BasketService {
 
     @Override
     public Basket increaseQuantity(ChangeQuantityRequest request) {
-        return null;
+        Basket basket = getBasketOrElseThrow(request.getBasketId());
+        basket.getItems().get(request.getProductId()).increaseQuantity();
+        return basketRepository.save(basket);
     }
 
     @Override
     public Basket decreaseQuantity(ChangeQuantityRequest request) {
-        return null;
+        Basket basket = getBasketOrElseThrow(request.getBasketId());
+        basket.getItems().get(request.getProductId()).decreaseQuantity();
+        return basketRepository.save(basket);
     }
 
     @Override
     public Basket changeQuantity(ChangeQuantityRequest request) {
-        return null;
+        Basket basket = getBasketOrElseThrow(request.getBasketId());
+        basket.getItems().get(request.getProductId()).setQuantity(request.getQuantity());
+        return basketRepository.save(basket);
     }
 
     @Override
@@ -42,17 +52,22 @@ public class BasketServiceV1 implements BasketService {
     }
 
     @Override
-    public Basket checkItem(ItemRequest request) {
+    public Basket checkOrUncheckItem(ItemRequest request) {
+        Basket basket = getBasketOrElseThrow(request.getBasketId());
+        basket.getItems().get(request.getProductId()).changeCheckBox();
         return null;
     }
 
     @Override
-    public Basket uncheckItem(ItemRequest request) {
-        return null;
+    public Basket completeOrder(UUID basketId) {
+        Basket basket = getBasketOrElseThrow(basketId);
+        basket.changeBasketStatus();
+        return basketRepository.save(basket);
     }
 
-    @Override
-    public Basket completeOrder() {
-        return null;
+    public Basket getBasketOrElseThrow(UUID uuid){
+        return basketRepository.findById(uuid).orElseThrow(RuntimeException::new);
     }
+
+
 }

@@ -46,14 +46,9 @@ public class BasketController {
         return ResponseEntity.ok(basketService.changeQuantity(request));
     }
 
-    public ResponseEntity<Basket> checkItem(ItemRequest request){
+    public ResponseEntity<Basket> checkOrUncheckItem(ItemRequest request){
         // Todo:Control of the request
-        return ResponseEntity.ok(basketService.checkItem(request));
-    }
-
-    public ResponseEntity<Basket> uncheckItem(ItemRequest request){
-        // Todo:Control of the request
-        return ResponseEntity.ok(basketService.uncheckItem(request));
+        return ResponseEntity.ok(basketService.checkOrUncheckItem(request));
     }
 
     public void completeOrder(){

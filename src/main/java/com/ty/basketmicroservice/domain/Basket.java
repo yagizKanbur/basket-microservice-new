@@ -1,5 +1,7 @@
 package com.ty.basketmicroservice.domain;
 
+import com.ty.basketmicroservice.dto.AddItemRequest;
+import com.ty.basketmicroservice.enums.BasketItemStatus;
 import com.ty.basketmicroservice.enums.BasketStatus;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;
@@ -8,6 +10,7 @@ import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,13 +22,34 @@ public class Basket {
     @Field
     private UUID sessionId;
     @Field
-    private Map<Long, BasketItem> items;
+    private Map<UUID, BasketItem> items;
     @Field
     private BasketInfo info;
     @Field
-    private Date creationDate;
+    private Long creationDate;
     @Field
     private BasketStatus status;
+
+    public Basket() {
+    }
+
+    public Basket(AddItemRequest request) {
+        this.sessionId = request.getSessionId();
+        this.items = new HashMap<>();
+        this.info = new BasketInfo();
+        this.status = BasketStatus.PENDING;
+        Date date = new Date();
+        this.creationDate = date.getTime();
+    }
+
+    public void changeBasketStatus(){
+        if(this.status == BasketStatus.PENDING){
+            this.status = BasketStatus.ORDERED;
+        }
+        else if(this.status == BasketStatus.ORDERED){
+            this.status = BasketStatus.PENDING;
+        }
+    }
 
     public UUID getId() {
         return id;
@@ -43,11 +67,11 @@ public class Basket {
         this.sessionId = sessionId;
     }
 
-    public Map<Long, BasketItem> getItems() {
+    public Map<UUID, BasketItem> getItems() {
         return items;
     }
 
-    public void setItems(Map<Long, BasketItem> items) {
+    public void setItems(Map<UUID, BasketItem> items) {
         this.items = items;
     }
 
@@ -59,11 +83,11 @@ public class Basket {
         this.info = info;
     }
 
-    public Date getCreationDate() {
+    public Long getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Long creationDate) {
         this.creationDate = creationDate;
     }
 

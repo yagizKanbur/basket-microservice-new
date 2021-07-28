@@ -1,5 +1,6 @@
 package com.ty.basketmicroservice.domain;
 
+import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.enums.BasketItemStatus;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;
@@ -10,9 +11,6 @@ import java.util.UUID;
 @Document
 public class BasketItem {
      @Id
-     private Long id;
-
-     @Field
      private UUID productId;
 
      @Field
@@ -30,13 +28,34 @@ public class BasketItem {
      @Field
     private BasketItemStatus status;
 
-     public Long getId() {
-          return id;
-     }
+    public BasketItem() {
+    }
 
-     public void setId(Long id) {
-          this.id = id;
-     }
+    public BasketItem(AddItemRequest request){
+        this.productId = request.getProductId();
+        this.productImage = request.getProductImage();
+        this.productInfo = request.getProductInfo();
+        this.productPrice = request.getProductPrice();
+        this.quantity = 1;
+        this.status = BasketItemStatus.CHECKED;
+    }
+
+    public void increaseQuantity(){
+        this.quantity++;
+    }
+
+    public void decreaseQuantity(){
+        this.quantity--;
+    }
+
+    public void changeCheckBox(){
+        if(this.status == BasketItemStatus.CHECKED){
+            this.status = BasketItemStatus.UNCHECKED;
+        }
+        else if(this.status == BasketItemStatus.UNCHECKED){
+            this.status = BasketItemStatus.CHECKED;
+        }
+    }
 
      public UUID getProductId() {
           return productId;
