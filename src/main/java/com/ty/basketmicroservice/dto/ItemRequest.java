@@ -11,6 +11,12 @@ public class ItemRequest {
 
     }
 
+    public ItemRequest(ChangeQuantityRequest request){
+        this.setBasketId(request.getBasketId());
+        this.setSessionId(request.getSessionId());
+        this.setProductId(request.getProductId());
+    }
+
     public Long getBasketId() {
         return basketId;
     }

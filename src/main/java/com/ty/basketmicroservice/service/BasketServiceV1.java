@@ -38,8 +38,14 @@ public class BasketServiceV1 implements BasketService {
     public Basket decreaseQuantity(ChangeQuantityRequest request) {
         Basket basket = getBasketOrElseThrow(request.getBasketId());
         BasketItem item = getItemFromBasket(basket, request.getProductId());
-        item.decreaseQuantity();
 
+        if(item.getQuantity() == 1){
+            ItemRequest removeRequest = new ItemRequest(request);
+            return removeItem(removeRequest);
+        }
+
+        item.decreaseQuantity();
+        subtractProductPriceFromTotalPrice(basket.getInfo(), item);
         return basketRepository.save(basket);
     }
 
@@ -48,6 +54,7 @@ public class BasketServiceV1 implements BasketService {
         Basket basket = getBasketOrElseThrow(request.getBasketId());
         basket.getItems().get(request.getProductId()).setQuantity(request.getQuantity());
         return basketRepository.save(basket);
+        // Todo: Price Calculation will be added
     }
 
     @Override
@@ -80,14 +87,22 @@ public class BasketServiceV1 implements BasketService {
     @Override
     public Basket removeItem(ItemRequest request) {
         Basket basket = getBasketOrElseThrow(request.getBasketId());
-        basket.getItems().remove(request.getProductId());
+        BasketItem item = getItemFromBasket(basket,request.getProductId());
+
+        basket.getItems().remove(item.getProductId());
+
+        calculatePriceAfterRemovingItem(basket.getInfo(), item);
         return basketRepository.save(basket);
     }
 
     @Override
     public Basket checkOrUncheckItem(ItemRequest request) {
         Basket basket = getBasketOrElseThrow(request.getBasketId());
-        basket.getItems().get(request.getProductId()).changeCheckBox();
+        BasketItem item = getItemFromBasket(basket,request.getProductId());
+        item.changeCheckBox();
+
+        // Todo: Price change based on checkbox
+
         return basketRepository.save(basket);
     }
 
@@ -98,9 +113,17 @@ public class BasketServiceV1 implements BasketService {
         return basketRepository.save(basket);
     }
 
+    // *********************************************************************
+
     public Basket getBasketOrElseThrow(Long id){
         return basketRepository.findById(id).orElseThrow(RuntimeException::new);
     }
+
+    public BasketItem getItemFromBasket(Basket basket, Long id){
+        return basket.getItems().get(id);
+    }
+
+    // **************** Price Calculation Methods **************************
 
     public BasketInfo calculatePrice(BasketInfo info ,BasketItem item){
         if (info.getSumOfProductPrices() == null){
@@ -113,8 +136,14 @@ public class BasketServiceV1 implements BasketService {
         return info;
     }
 
-    public BasketItem getItemFromBasket(Basket basket, Long id){
-        return basket.getItems().get(id);
+    public void subtractProductPriceFromTotalPrice(BasketInfo info, BasketItem item){
+        info.setSumOfProductPrices(info.getSumOfProductPrices() - item.getProductPrice());
+        info.setTotalPrice();
+    }
+
+    public void calculatePriceAfterRemovingItem (BasketInfo info, BasketItem item){
+        info.setSumOfProductPrices(info.getSumOfProductPrices() - item.getProductPrice()*item.getQuantity());
+        info.setTotalPrice();
     }
 
 

@@ -47,7 +47,7 @@ public class BasketController {
         return ResponseEntity.ok(basketService.changeQuantity(request));
     }
 
-    @PutMapping("checkbox")
+    @PutMapping("/checkbox")
     public ResponseEntity<Basket> checkOrUncheckItem(@RequestBody ItemRequest request){
         // Todo:Control of the request
         return ResponseEntity.ok(basketService.checkOrUncheckItem(request));
