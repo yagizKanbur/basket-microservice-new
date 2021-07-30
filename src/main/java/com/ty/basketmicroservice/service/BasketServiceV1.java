@@ -35,7 +35,7 @@ public class BasketServiceV1 implements BasketService {
     }
 
     @Override
-    public Basket decreaseQuantity(ChangeQuantityRequest request) {
+     public Basket decreaseQuantity(ChangeQuantityRequest request) {
         Basket basket = getBasketOrElseThrow(request.getBasketId());
         BasketItem item = getItemFromBasket(basket, request.getProductId());
 
@@ -52,9 +52,12 @@ public class BasketServiceV1 implements BasketService {
     @Override
     public Basket changeQuantity(ChangeQuantityRequest request) {
         Basket basket = getBasketOrElseThrow(request.getBasketId());
-        basket.getItems().get(request.getProductId()).setQuantity(request.getQuantity());
+        BasketItem item = getItemFromBasket(basket,request.getProductId());
+        int changeInQuantity = request.getQuantity() - item.getQuantity();
+        item.setQuantity(request.getQuantity());
+        calculatePriceAfterChangingQuantity(basket.getInfo(), item, changeInQuantity);
+
         return basketRepository.save(basket);
-        // Todo: Price Calculation will be added
     }
 
     @Override
@@ -142,7 +145,14 @@ public class BasketServiceV1 implements BasketService {
     }
 
     public void calculatePriceAfterRemovingItem (BasketInfo info, BasketItem item){
-        info.setSumOfProductPrices(info.getSumOfProductPrices() - item.getProductPrice()*item.getQuantity());
+        Double newPrice = info.getSumOfProductPrices() - item.getProductPrice()*item.getQuantity();
+        info.setSumOfProductPrices(newPrice);
+        info.setTotalPrice();
+    }
+
+    public void calculatePriceAfterChangingQuantity(BasketInfo info, BasketItem item, int changeInQuantity){
+        Double newPrice = info.getSumOfProductPrices() + item.getProductPrice() * changeInQuantity;
+        info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
     }
 
