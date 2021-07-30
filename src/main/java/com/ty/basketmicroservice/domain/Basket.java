@@ -18,11 +18,11 @@ import java.util.UUID;
 public class Basket {
     @Id
     @GeneratedValue(strategy = GenerationStrategy.UNIQUE)
-    private UUID id;
+    private Long id;
     @Field
-    private UUID sessionId;
+    private Long sessionId;
     @Field
-    private Map<UUID, BasketItem> items;
+    private Map<Long, BasketItem> items;
     @Field
     private BasketInfo info;
     @Field
@@ -34,6 +34,7 @@ public class Basket {
     }
 
     public Basket(AddItemRequest request) {
+        this.id = request.getBasketId();
         this.sessionId = request.getSessionId();
         this.items = new HashMap<>();
         this.info = new BasketInfo();
@@ -55,27 +56,27 @@ public class Basket {
         items.putIfAbsent(item.getProductId(), item);
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public UUID getSessionId() {
+    public Long getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(UUID sessionId) {
+    public void setSessionId(Long sessionId) {
         this.sessionId = sessionId;
     }
 
-    public Map<UUID, BasketItem> getItems() {
+    public Map<Long, BasketItem> getItems() {
         return items;
     }
 
-    public void setItems(Map<UUID, BasketItem> items) {
+    public void setItems(Map<Long, BasketItem> items) {
         this.items = items;
     }
 

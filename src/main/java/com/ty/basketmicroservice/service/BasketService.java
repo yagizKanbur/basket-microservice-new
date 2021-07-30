@@ -14,5 +14,5 @@ public interface BasketService {
     Basket addItem(AddItemRequest request);
     Basket removeItem(ItemRequest request);
     Basket checkOrUncheckItem(ItemRequest request);
-    Basket completeOrder(UUID uuid);
+    Basket completeOrder(Long id);
 }

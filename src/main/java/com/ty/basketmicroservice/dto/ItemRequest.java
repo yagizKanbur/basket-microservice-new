@@ -3,35 +3,35 @@ package com.ty.basketmicroservice.dto;
 import java.util.UUID;
 
 public class ItemRequest {
-    private UUID basketId;
-    private UUID sessionId;
-    private UUID productId;
+    private Long basketId;
+    private Long sessionId;
+    private Long productId;
 
     public ItemRequest(){
 
     }
 
-    public UUID getBasketId() {
+    public Long getBasketId() {
         return basketId;
     }
 
-    public void setBasketId(UUID basketId) {
+    public void setBasketId(Long basketId) {
         this.basketId = basketId;
     }
 
-    public UUID getSessionId() {
+    public Long getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(UUID sessionId) {
+    public void setSessionId(Long sessionId) {
         this.sessionId = sessionId;
     }
 
-    public UUID getProductId() {
+    public Long getProductId() {
         return productId;
     }
 
-    public void setProductId(UUID productId) {
+    public void setProductId(Long productId) {
         this.productId = productId;
     }
 }

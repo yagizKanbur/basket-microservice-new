@@ -13,6 +13,11 @@ public class BasketInfo {
     @Field
     private Double totalPrice;
 
+    public BasketInfo(){
+        sumOfShippingPrices= 4.0;
+        totalPrice = sumOfShippingPrices;
+    }
+
     public Double getSumOfProductPrices() {
         return sumOfProductPrices;
     }
@@ -33,7 +38,7 @@ public class BasketInfo {
         return totalPrice;
     }
 
-    public void setTotalPrice(Double totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setTotalPrice() {
+        this.totalPrice = sumOfProductPrices +  sumOfShippingPrices;
     }
 }

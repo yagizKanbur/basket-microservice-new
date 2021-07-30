@@ -4,54 +4,57 @@ import com.ty.basketmicroservice.domain.Basket;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
-import com.ty.basketmicroservice.service.BasketService;
+import com.ty.basketmicroservice.service.BasketServiceV1;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.awt.desktop.PreferencesEvent;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/basket")
 public class BasketController {
-    private final BasketService basketService;
+    private final BasketServiceV1 basketService;
 
-    public BasketController(BasketService basketService){
+    public BasketController(BasketServiceV1 basketService){
         this.basketService = basketService;
     }
 
-    public ResponseEntity<Basket> addItem (AddItemRequest request){
+    @PostMapping
+    public ResponseEntity<Basket> addItem (@RequestBody AddItemRequest request){
         // Todo:Control of the request
         return ResponseEntity.ok(basketService.addItem(request));
     }
 
-    public ResponseEntity<Basket> removeItem(ItemRequest request){
+    @PutMapping("/remove")
+    public ResponseEntity<Basket> removeItem(@RequestBody ItemRequest request){
         // Todo:Control of the request
         return ResponseEntity.ok(basketService.removeItem(request));
     }
 
-    public ResponseEntity<Basket> increaseQuantity(ChangeQuantityRequest request){
+    @PutMapping("/increase")
+    public ResponseEntity<Basket> increaseQuantity(@RequestBody ChangeQuantityRequest request){
         // Todo:Control of the request
         return ResponseEntity.ok(basketService.increaseQuantity(request));
     }
 
-    public ResponseEntity<Basket> decreaseQuantity(ChangeQuantityRequest request){
+    @PutMapping("/decrease")
+    public ResponseEntity<Basket> decreaseQuantity(@RequestBody ChangeQuantityRequest request){
         // Todo:Control of the request
         return ResponseEntity.ok(basketService.decreaseQuantity(request));
     }
 
-    public ResponseEntity<Basket> changeQuantity(ChangeQuantityRequest request){
+    @PutMapping("/change")
+    public ResponseEntity<Basket> changeQuantity(@RequestBody ChangeQuantityRequest request){
         // Todo:Control of the request
         return ResponseEntity.ok(basketService.changeQuantity(request));
     }
 
-    public ResponseEntity<Basket> checkOrUncheckItem(ItemRequest request){
+    @PutMapping("checkbox")
+    public ResponseEntity<Basket> checkOrUncheckItem(@RequestBody ItemRequest request){
         // Todo:Control of the request
         return ResponseEntity.ok(basketService.checkOrUncheckItem(request));
     }
 
-    public void completeOrder(){
-        //
+    @PostMapping("/order")
+    public ResponseEntity<Basket> completeOrder(@RequestBody Long id){
+        return ResponseEntity.ok(basketService.completeOrder(id));
     }
 }

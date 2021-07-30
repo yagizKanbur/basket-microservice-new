@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface BasketRepository extends CouchbaseRepository<Basket, UUID> {
+public interface BasketRepository extends CouchbaseRepository<Basket, Long> {
 
 }

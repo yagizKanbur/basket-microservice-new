@@ -11,7 +11,7 @@ import java.util.UUID;
 @Document
 public class BasketItem {
      @Id
-     private UUID productId;
+     private Long productId;
 
      @Field
      private String productImage;
@@ -41,7 +41,7 @@ public class BasketItem {
     }
 
     public void increaseQuantity(){
-        this.quantity++;
+        quantity++;
     }
 
     public void decreaseQuantity(){
@@ -57,15 +57,15 @@ public class BasketItem {
         }
     }
 
-     public UUID getProductId() {
-          return productId;
-     }
+    public Long getProductId() {
+        return productId;
+    }
 
-     public void setProductId(UUID productId) {
-          this.productId = productId;
-     }
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
 
-     public String getProductImage() {
+    public String getProductImage() {
           return productImage;
      }
 
