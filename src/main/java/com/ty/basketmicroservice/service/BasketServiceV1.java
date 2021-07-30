@@ -30,7 +30,6 @@ public class BasketServiceV1 implements BasketService {
         item.increaseQuantity();
 
         BasketInfo info = calculatePrice(basket.getInfo(),item);
-
         basket.setInfo(info);
 
         return basketRepository.save(basket);
@@ -39,6 +38,7 @@ public class BasketServiceV1 implements BasketService {
     @Override
      public Basket decreaseQuantity(ChangeQuantityRequest request) {
         Basket basket = getBasketOrElseThrow(request.getBasketId());
+        isItemInTheBasket(basket,request.getProductId());
         BasketItem item = getItemFromBasket(basket, request.getProductId());
 
         if(item.getQuantity() == 1){
@@ -130,6 +130,12 @@ public class BasketServiceV1 implements BasketService {
     public BasketStatus checkBasketStatus (Long basketId){
         Basket basket = getBasketOrElseThrow(basketId);
         return basket.getStatus();
+    }
+
+    public void isItemInTheBasket (Basket basket, Long productId) throws NullPointerException{
+        if(basket.getItems().get(productId) == null){
+            throw new NullPointerException("Item doesnt exist");
+        }
     }
 
     // **************** Price Calculation Methods **************************

@@ -6,8 +6,10 @@ import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
 import com.ty.basketmicroservice.enums.BasketStatus;
 import com.ty.basketmicroservice.service.BasketServiceV1;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 @RequestMapping("/basket")
@@ -21,43 +23,57 @@ public class BasketController {
     @PostMapping
     public ResponseEntity<?> addItem (@RequestBody AddItemRequest request){
         if(basketService.checkBasketStatus(request.getBasketId()) == BasketStatus.ORDERED){
-            return null;
+            return new ResponseEntity<>("Items already ordered", HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok(basketService.addItem(request));
     }
 
     @PutMapping("/remove")
-    public ResponseEntity<Basket> removeItem(@RequestBody ItemRequest request){
-        // Todo:Control of the request
+    public ResponseEntity<?> removeItem(@RequestBody ItemRequest request){
+        if(basketService.checkBasketStatus(request.getBasketId()) == BasketStatus.ORDERED){
+            return new ResponseEntity<>("Items already ordered", HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(basketService.removeItem(request));
     }
 
     @PutMapping("/increase")
-    public ResponseEntity<Basket> increaseQuantity(@RequestBody ChangeQuantityRequest request){
-        // Todo:Control of the request
+    public ResponseEntity<?> increaseQuantity(@RequestBody ChangeQuantityRequest request){
+        if(basketService.checkBasketStatus(request.getBasketId()) == BasketStatus.ORDERED){
+            return new ResponseEntity<>("Items already ordered", HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(basketService.increaseQuantity(request));
     }
 
     @PutMapping("/decrease")
-    public ResponseEntity<Basket> decreaseQuantity(@RequestBody ChangeQuantityRequest request){
-        // Todo:Control of the request
+    public ResponseEntity<?> decreaseQuantity(@RequestBody ChangeQuantityRequest request){
+        if(basketService.checkBasketStatus(request.getBasketId()) == BasketStatus.ORDERED){
+            return new ResponseEntity<>("Items already ordered", HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(basketService.decreaseQuantity(request));
     }
 
     @PutMapping("/change")
-    public ResponseEntity<Basket> changeQuantity(@RequestBody ChangeQuantityRequest request){
-        // Todo:Control of the request
+    public ResponseEntity<?> changeQuantity(@RequestBody ChangeQuantityRequest request){
+        if(basketService.checkBasketStatus(request.getBasketId()) == BasketStatus.ORDERED){
+            return new ResponseEntity<>("Items already ordered", HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(basketService.changeQuantity(request));
     }
 
     @PutMapping("/checkbox")
-    public ResponseEntity<Basket> checkOrUncheckItem(@RequestBody ItemRequest request){
-        // Todo:Control of the request
+    public ResponseEntity<?> checkOrUncheckItem(@RequestBody ItemRequest request){
+        if(basketService.checkBasketStatus(request.getBasketId()) == BasketStatus.ORDERED){
+            return new ResponseEntity<>("Items already ordered", HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(basketService.checkOrUncheckItem(request));
     }
 
-    @PostMapping("/order")
-    public ResponseEntity<Basket> completeOrder(@RequestBody Long id){
-        return ResponseEntity.ok(basketService.completeOrder(id));
+    @PutMapping("/{basketId}")
+    public ResponseEntity<?> completeOrder(@RequestBody Long basketId){
+        if(basketService.checkBasketStatus(basketId) == BasketStatus.ORDERED){
+            return new ResponseEntity<>("Items already ordered", HttpStatus.BAD_REQUEST);
+        }
+        // Todo : request problem check later
+        return ResponseEntity.ok(basketService.completeOrder(basketId));
     }
 }
