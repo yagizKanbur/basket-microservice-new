@@ -6,6 +6,8 @@ import com.ty.basketmicroservice.domain.BasketItem;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
+import com.ty.basketmicroservice.enums.BasketItemStatus;
+import com.ty.basketmicroservice.enums.BasketStatus;
 import com.ty.basketmicroservice.repository.BasketRepository;
 
 import org.springframework.stereotype.Service;
@@ -103,8 +105,7 @@ public class BasketServiceV1 implements BasketService {
         Basket basket = getBasketOrElseThrow(request.getBasketId());
         BasketItem item = getItemFromBasket(basket,request.getProductId());
         item.changeCheckBox();
-
-        // Todo: Price change based on checkbox
+        calculatePriceAfterCheckboxChange(basket.getInfo(), item, item.getStatus());
 
         return basketRepository.save(basket);
     }
@@ -126,6 +127,11 @@ public class BasketServiceV1 implements BasketService {
         return basket.getItems().get(id);
     }
 
+    public BasketStatus checkBasketStatus (Long basketId){
+        Basket basket = getBasketOrElseThrow(basketId);
+        return basket.getStatus();
+    }
+
     // **************** Price Calculation Methods **************************
 
     public BasketInfo calculatePrice(BasketInfo info ,BasketItem item){
@@ -134,13 +140,15 @@ public class BasketServiceV1 implements BasketService {
             info.setTotalPrice();
             return info;
         }
-        info.setSumOfProductPrices(item.getProductPrice() + info.getSumOfProductPrices());
+        Double newPrice = item.getProductPrice() + info.getSumOfProductPrices();
+        info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
         return info;
     }
 
     public void subtractProductPriceFromTotalPrice(BasketInfo info, BasketItem item){
-        info.setSumOfProductPrices(info.getSumOfProductPrices() - item.getProductPrice());
+        Double newPrice = info.getSumOfProductPrices() - item.getProductPrice();
+        info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
     }
 
@@ -156,5 +164,15 @@ public class BasketServiceV1 implements BasketService {
         info.setTotalPrice();
     }
 
-
+    public void calculatePriceAfterCheckboxChange(BasketInfo info, BasketItem item , BasketItemStatus status ){
+        if(status.equals(BasketItemStatus.CHECKED)){
+            Double newPrice = info.getSumOfProductPrices() + item.getProductPrice() * item.getQuantity();
+            info.setSumOfProductPrices(newPrice);
+            info.setTotalPrice();
+        }else if(status.equals(BasketItemStatus.UNCHECKED)){
+            Double newPrice = info.getSumOfProductPrices() - item.getProductPrice() * item.getQuantity();
+            info.setSumOfProductPrices(newPrice);
+            info.setTotalPrice();
+        }
+    }
 }

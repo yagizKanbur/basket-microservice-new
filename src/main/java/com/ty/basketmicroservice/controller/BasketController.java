@@ -4,6 +4,7 @@ import com.ty.basketmicroservice.domain.Basket;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
+import com.ty.basketmicroservice.enums.BasketStatus;
 import com.ty.basketmicroservice.service.BasketServiceV1;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,10 @@ public class BasketController {
     }
 
     @PostMapping
-    public ResponseEntity<Basket> addItem (@RequestBody AddItemRequest request){
-        // Todo:Control of the request
+    public ResponseEntity<?> addItem (@RequestBody AddItemRequest request){
+        if(basketService.checkBasketStatus(request.getBasketId()) == BasketStatus.ORDERED){
+            return null;
+        }
         return ResponseEntity.ok(basketService.addItem(request));
     }
 
