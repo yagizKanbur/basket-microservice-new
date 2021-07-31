@@ -10,7 +10,6 @@ import com.ty.basketmicroservice.model.BasketItem;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
-import com.ty.basketmicroservice.enums.BasketItemStatus;
 import com.ty.basketmicroservice.enums.BasketStatus;
 import com.ty.basketmicroservice.repository.BasketRepository;
 
@@ -207,5 +206,15 @@ public class BasketServiceV1 implements BasketService {
             return true;
         }
         return false;
+    }
+
+    public boolean checkBasketValidation(Optional<Basket> optionalBasket){
+        if (optionalBasket.isEmpty()) {
+            throw new BasketNotFoundException();
+        }
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+            throw new BasketAlreadyOrderedException();
+        }
+        return true;
     }
 }
