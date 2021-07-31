@@ -1,11 +1,9 @@
 package com.ty.basketmicroservice.service;
 
-import com.ty.basketmicroservice.domain.Basket;
+import com.ty.basketmicroservice.model.Basket;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
-
-import java.util.UUID;
 
 public interface BasketService {
     Basket increaseQuantity(ChangeQuantityRequest request);

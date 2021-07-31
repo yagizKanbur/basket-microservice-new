@@ -1,43 +1,16 @@
 package com.ty.basketmicroservice.dto;
 
-import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@Builder
 public class ItemRequest {
     private Long basketId;
     private Long sessionId;
     private Long productId;
 
-    public ItemRequest(){
 
-    }
-
-    public ItemRequest(ChangeQuantityRequest request){
-        this.setBasketId(request.getBasketId());
-        this.setSessionId(request.getSessionId());
-        this.setProductId(request.getProductId());
-    }
-
-    public Long getBasketId() {
-        return basketId;
-    }
-
-    public void setBasketId(Long basketId) {
-        this.basketId = basketId;
-    }
-
-    public Long getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(Long sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
 }

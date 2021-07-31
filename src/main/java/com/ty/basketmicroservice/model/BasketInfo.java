@@ -1,9 +1,13 @@
-package com.ty.basketmicroservice.domain;
+package com.ty.basketmicroservice.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.Field;
 
 @Document
+@Getter
+@Setter
 public class BasketInfo {
     // Todo: Should we implement id here.
     @Field
@@ -16,26 +20,6 @@ public class BasketInfo {
     public BasketInfo(){
         sumOfShippingPrices= 4.0;
         totalPrice = sumOfShippingPrices;
-    }
-
-    public Double getSumOfProductPrices() {
-        return sumOfProductPrices;
-    }
-
-    public void setSumOfProductPrices(Double sumOfProductPrices) {
-        this.sumOfProductPrices = sumOfProductPrices;
-    }
-
-    public Double getSumOfShippingPrices() {
-        return sumOfShippingPrices;
-    }
-
-    public void setSumOfShippingPrices(Double sumOfShippingPrices) {
-        this.sumOfShippingPrices = sumOfShippingPrices;
-    }
-
-    public Double getTotalPrice() {
-        return totalPrice;
     }
 
     public void setTotalPrice() {
