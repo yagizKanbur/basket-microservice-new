@@ -1,6 +1,5 @@
 package com.ty.basketmicroservice.controller;
 
-import com.ty.basketmicroservice.domain.Basket;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
@@ -9,7 +8,6 @@ import com.ty.basketmicroservice.service.BasketServiceV1;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 @RequestMapping("/basket")
@@ -22,9 +20,6 @@ public class BasketController {
 
     @PostMapping
     public ResponseEntity<?> addItem (@RequestBody AddItemRequest request){
-        if(basketService.checkBasketStatus(request.getBasketId()) == BasketStatus.ORDERED){
-            return new ResponseEntity<>("Items already ordered", HttpStatus.BAD_REQUEST);
-        }
         return ResponseEntity.ok(basketService.addItem(request));
     }
 
