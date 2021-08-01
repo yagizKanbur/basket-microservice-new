@@ -2,7 +2,9 @@ package com.ty.basketmicroservice.advice;
 
 import com.ty.basketmicroservice.exceptions.BasketNotFoundException;
 import com.ty.basketmicroservice.exceptions.ItemNotFoundException;
+import org.apache.kafka.common.KafkaException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,23 +13,34 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class BasketControllerAdvice {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<String> handleNotSupportedMethod (HttpRequestMethodNotSupportedException httpRequestMethodNotSupportedException){
+    public ResponseEntity<String> handleNotSupportedMethod(HttpRequestMethodNotSupportedException e) {
         //log.ınfo()
-        return ResponseEntity.badRequest().body("Request is not valid");
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument (IllegalArgumentException illegalArgumentException){
-        return  ResponseEntity.badRequest().body("The given id must not be null");
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(BasketNotFoundException.class)
-    public ResponseEntity<String> handleBasketNotFound (BasketNotFoundException e){
-        return  ResponseEntity.badRequest().body("Basket not found");
+    public ResponseEntity<String> handleBasketNotFound(BasketNotFoundException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(ItemNotFoundException.class)
-    public ResponseEntity<String> handleItemNotFound (ItemNotFoundException e){
-        return ResponseEntity.badRequest().body("Item not found in the basket");
+    public ResponseEntity<String> handleItemNotFound(ItemNotFoundException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    @ExceptionHandler(KafkaException.class)
+    public ResponseEntity<String> handleKafkaException(KafkaException e) {
+        return ResponseEntity.internalServerError().body(e.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
 }

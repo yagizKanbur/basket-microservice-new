@@ -101,7 +101,7 @@ public class BasketServiceV1 implements BasketService {
 
         if (optionalBasket.isEmpty() || BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             Basket createdBasket = createBasket(request);
-            kafkaTemplate.send(CREATE_TOPIC, JSON.toJSONString(createdBasket, false));
+            //kafkaTemplate.send(CREATE_TOPIC, JSON.toJSONString(createdBasket, false));
             return basketRepository.save(createdBasket);
         }
 
@@ -118,7 +118,7 @@ public class BasketServiceV1 implements BasketService {
         BasketItem item = new BasketItem(request);
 
         basket.addItem(item);
-        kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
+        //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
 
@@ -138,7 +138,7 @@ public class BasketServiceV1 implements BasketService {
         BasketItem item = getItemFromBasket(basket, request.getProductId());
 
         basket.removeItem(item.getProductId());
-        kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
+        //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
 
@@ -172,7 +172,7 @@ public class BasketServiceV1 implements BasketService {
         }
         Basket basket = optionalBasket.get();
         basket.changeBasketStatus();
-        kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
+        //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
 
@@ -188,8 +188,8 @@ public class BasketServiceV1 implements BasketService {
         return basket;
     }
 
-    public BasketItem getItemFromBasket(Basket basket, Long id) {
-        return basket.getItems().get(id);
+    public BasketItem getItemFromBasket(Basket basket, Long productId) {
+        return basket.getItems().get(productId);
     }
 
     public BasketStatus checkBasketStatus(Long basketId) {

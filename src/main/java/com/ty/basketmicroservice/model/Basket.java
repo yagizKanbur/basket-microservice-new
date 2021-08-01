@@ -45,99 +45,95 @@ public class Basket {
     }
 
     public Map<Long, BasketItem> getItems() {
-        return Collections.unmodifiableMap(items);
+        //Todo: return Collections.unmodifiableMap(items);
+        return items;
     }
 
-    public void changeBasketStatus(){
-        if(this.status == BasketStatus.PENDING){
+    public void changeBasketStatus() {
+        if (this.status == BasketStatus.PENDING) {
             this.status = BasketStatus.ORDERED;
-        }
-        else if(this.status == BasketStatus.ORDERED){
+        } else if (this.status == BasketStatus.ORDERED) {
             this.status = BasketStatus.PENDING;
         }
     }
 
-    public void addItem(BasketItem item){
+    public void addItem(BasketItem item) {
         this.calculatePrice(item);
         this.getItems().putIfAbsent(item.getProductId(), item);
     }
 
-    public void removeItem(Long productId){
+    public void removeItem(Long productId) {
         BasketItem item = this.getItems().get(productId);
         this.getItems().remove(productId);
         calculatePriceAfterRemovingItem(item);
     }
 
-    public void increaseItemQuantity(Long productId){
+    public void increaseItemQuantity(Long productId) {
         BasketItem item = this.getItems().get(productId);
         item.increaseQuantity();
         calculatePrice(item);
     }
 
-    public void decreaseItemQuantity(Long productId){
+    public void decreaseItemQuantity(Long productId) {
         BasketItem item = this.getItems().get(productId);
         item.decreaseQuantity();
         calculatePriceAfterDecreaseInQuantity(item);
     }
 
-    public void changeItemQuantity(Long productId, int newQuantity){
+    public void changeItemQuantity(Long productId, int newQuantity) {
         BasketItem item = this.getItems().get(productId);
         int changeInQuantity = newQuantity - item.getQuantity();
         item.setQuantity(newQuantity);
-        calculatePriceAfterChangingQuantity(item,changeInQuantity);
+        calculatePriceAfterChangingQuantity(item, changeInQuantity);
     }
 
-    public void reverseBasketItemStatus(Long productId){
+    public void reverseBasketItemStatus(Long productId) {
         BasketItem item = this.getItems().get(productId);
         item.reverseBasketItemStatus();
-        calculatePriceAfterChangingCheckboxStatus(item,item.getStatus());
+        calculatePriceAfterChangingCheckboxStatus(item, item.getStatus());
     }
 
     //****************** Price Calculation Methods *******************************
 
-    public void calculatePrice(BasketItem item){
-        if(info.getSumOfProductPrices() == null){
+    public void calculatePrice(BasketItem item) {
+        if (info.getSumOfProductPrices() == null) {
             info.setSumOfProductPrices(item.getProductPrice());
-            info.setTotalPrice();
+        } else {
+            Double newPrice = item.getProductPrice() + info.getSumOfProductPrices();
+            info.setSumOfProductPrices(newPrice);
         }
-        Double newPrice = item.getProductPrice() + info.getSumOfProductPrices();
-        info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
     }
 
-    public void calculatePriceAfterDecreaseInQuantity(BasketItem item){
+    public void calculatePriceAfterDecreaseInQuantity(BasketItem item) {
         Double newPrice = info.getSumOfProductPrices() - item.getProductPrice();
         info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
     }
 
-    public void calculatePriceAfterChangingQuantity(BasketItem item, int changeInQuantity){
+    public void calculatePriceAfterChangingQuantity(BasketItem item, int changeInQuantity) {
         Double newPrice = info.getSumOfProductPrices() + item.getProductPrice() * changeInQuantity;
         info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
     }
 
-    public void calculatePriceAfterRemovingItem(BasketItem item){
-        Double newPrice = info.getSumOfProductPrices() - item.getProductPrice()*item.getQuantity();
+    public void calculatePriceAfterRemovingItem(BasketItem item) {
+        Double newPrice = info.getSumOfProductPrices() - item.getProductPrice() * item.getQuantity();
         info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
     }
 
-    public void calculatePriceAfterChangingCheckboxStatus(BasketItem item, BasketItemStatus status){
-        if(BasketItemStatus.CHECKED.equals(status)){
+    public void calculatePriceAfterChangingCheckboxStatus(BasketItem item, BasketItemStatus status) {
+        if (BasketItemStatus.CHECKED.equals(status)) {
             Double newPrice = info.getSumOfProductPrices() + item.getProductPrice() * item.getQuantity();
             info.setSumOfProductPrices(newPrice);
             info.setTotalPrice();
-        } else if(BasketItemStatus.UNCHECKED.equals(status)){
+        } else if (BasketItemStatus.UNCHECKED.equals(status)) {
             Double newPrice = info.getSumOfProductPrices() - item.getProductPrice() * item.getQuantity();
             info.setSumOfProductPrices(newPrice);
             info.setTotalPrice();
         }
     }
-
-
-
-
 
 
 }
