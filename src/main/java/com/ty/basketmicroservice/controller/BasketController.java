@@ -27,12 +27,12 @@ public class BasketController {
     }
 
     @PutMapping("/increase")
-    public ResponseEntity<?> increaseQuantity(@RequestBody ChangeQuantityRequest request) {
+    public ResponseEntity<?> increaseQuantity(@RequestBody ItemRequest request) {
         return ResponseEntity.ok(basketService.increaseQuantity(request));
     }
 
     @PutMapping("/decrease")
-    public ResponseEntity<?> decreaseQuantity(@RequestBody ChangeQuantityRequest request) {
+    public ResponseEntity<?> decreaseQuantity(@RequestBody ItemRequest request) {
         return ResponseEntity.ok(basketService.decreaseQuantity(request));
     }
 
@@ -46,7 +46,7 @@ public class BasketController {
         return ResponseEntity.ok(basketService.checkOrUncheckItem(request));
     }
 
-    @PutMapping("/{basketId}")
+    @PutMapping("/order")
     public ResponseEntity<?> completeOrder(@RequestBody Long basketId) {
         // Todo : request problem check later
         return ResponseEntity.ok(basketService.completeOrder(basketId));

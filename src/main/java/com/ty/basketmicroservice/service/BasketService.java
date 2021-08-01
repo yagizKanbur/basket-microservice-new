@@ -6,8 +6,8 @@ import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
 
 public interface BasketService {
-    Basket increaseQuantity(ChangeQuantityRequest request);
-    Basket decreaseQuantity(ChangeQuantityRequest request);
+    Basket increaseQuantity(ItemRequest request);
+    Basket decreaseQuantity(ItemRequest request);
     Basket changeQuantity(ChangeQuantityRequest request);
     Basket addItem(AddItemRequest request);
     Basket removeItem(ItemRequest request);

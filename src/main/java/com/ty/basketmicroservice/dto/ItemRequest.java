@@ -9,7 +9,6 @@ import lombok.Setter;
 @Builder
 public class ItemRequest {
     private Long basketId;
-    private Long sessionId;
     private Long productId;
 
 

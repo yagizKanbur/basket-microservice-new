@@ -9,7 +9,6 @@ import lombok.Setter;
 @Builder
 public class ChangeQuantityRequest {
     private Long basketId;
-    private Long sessionId;
     private Long productId;
     private int quantity;
 

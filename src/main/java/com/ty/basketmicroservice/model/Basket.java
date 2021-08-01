@@ -3,6 +3,7 @@ package com.ty.basketmicroservice.model;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.enums.BasketItemStatus;
 import com.ty.basketmicroservice.enums.BasketStatus;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -32,6 +33,11 @@ public class Basket {
     private BasketStatus status;
 
     public Basket() {
+        this.items = new HashMap<>();
+        this.info = new BasketInfo();
+        this.status = BasketStatus.PENDING;
+        Date date = new Date();
+        this.creationDate = date.getTime();
     }
 
     public Basket(AddItemRequest request) {

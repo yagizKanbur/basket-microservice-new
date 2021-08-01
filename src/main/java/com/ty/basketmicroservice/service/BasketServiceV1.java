@@ -1,9 +1,7 @@
 package com.ty.basketmicroservice.service;
 
 import com.alibaba.fastjson.JSON;
-import com.ty.basketmicroservice.exceptions.BasketAlreadyOrderedException;
-import com.ty.basketmicroservice.exceptions.BasketNotFoundException;
-import com.ty.basketmicroservice.exceptions.ItemNotFoundException;
+import com.ty.basketmicroservice.exceptions.*;
 import com.ty.basketmicroservice.model.Basket;
 import com.ty.basketmicroservice.model.BasketInfo;
 import com.ty.basketmicroservice.model.BasketItem;
@@ -32,37 +30,22 @@ public class BasketServiceV1 implements BasketService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Override
-    public Basket increaseQuantity(ChangeQuantityRequest request) {
+    public Basket increaseQuantity(ItemRequest request) {
         Optional<Basket> optionalBasket = basketRepository.findById(request.getBasketId());
-        if (optionalBasket.isEmpty()) {
-            throw new BasketNotFoundException();
-        }
-        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
-            throw new BasketAlreadyOrderedException();
-        }
-        Basket basket = optionalBasket.get();
-        if (!isItemInTheBasket(basket, request.getProductId())) {
-            throw new ItemNotFoundException();
-        }
-
-        basket.increaseItemQuantity(request.getProductId());
+        Basket basket = getBasketIfValid(optionalBasket);
+        BasketItem item = getItemFromBasketIfExists(basket,request.getProductId());
+        basket.increaseItemQuantity(item.getProductId());
         return basketRepository.save(basket);
-
     }
 
     @Override
-    public Basket decreaseQuantity(ChangeQuantityRequest request) {
+    public Basket decreaseQuantity(ItemRequest request) {
         Optional<Basket> optionalBasket = basketRepository.findById(request.getBasketId());
         Basket basket = getBasketIfValid(optionalBasket);
         BasketItem item = getItemFromBasketIfExists(basket,request.getProductId());
 
         if (item.getQuantity() == 1) {
-            ItemRequest removeRequest = ItemRequest.builder()
-                    .basketId(request.getBasketId())
-                    .productId(request.getProductId())
-                    .sessionId(request.getSessionId())
-                    .build();
-            return removeItem(removeRequest);
+            return removeItem(request);
         }
 
         basket.decreaseItemQuantity(item.getProductId());
@@ -71,6 +54,10 @@ public class BasketServiceV1 implements BasketService {
 
     @Override
     public Basket changeQuantity(ChangeQuantityRequest request) {
+        if(request.getQuantity()<=0){
+            throw new NegativeQuantityException();
+        }
+
         Optional<Basket> optionalBasket = basketRepository.findById(request.getBasketId());
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
@@ -87,6 +74,8 @@ public class BasketServiceV1 implements BasketService {
 
     @Override
     public Basket addItem(AddItemRequest request) {
+        // Todo: Create basket if there is no basket id in the request
+
         Optional<Basket> optionalBasket = basketRepository.findById(request.getBasketId());
 
         if (optionalBasket.isEmpty() || BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
@@ -97,14 +86,24 @@ public class BasketServiceV1 implements BasketService {
 
         Basket basket = optionalBasket.get();
 
+        if(!compareAddItemRequestWithBasket(request,basket)){
+            throw new RequestMismatchedWithBasketDataException();
+        }
+
         if (basket.getItems().containsKey(request.getProductId())) {
-            ChangeQuantityRequest changeQuantityRequest = ChangeQuantityRequest.builder()
+            BasketItem item = getItemFromBasket(basket,request.getProductId());
+
+            if(!compareAddItemRequestWithItem(request,item)){
+                throw new RequestMismatchedWithBasketDataException();
+            }
+
+            ItemRequest itemRequest = ItemRequest.builder()
                     .basketId(request.getBasketId())
                     .productId(request.getProductId())
-                    .sessionId(request.getSessionId())
                     .build();
-            return increaseQuantity(changeQuantityRequest);
+            return increaseQuantity(itemRequest);
         }
+
         BasketItem item = new BasketItem(request);
 
         basket.addItem(item);
@@ -162,7 +161,7 @@ public class BasketServiceV1 implements BasketService {
         }
         Basket basket = optionalBasket.get();
         basket.changeBasketStatus();
-        //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
+        //kafkaTemplate.send(, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
 
@@ -180,15 +179,6 @@ public class BasketServiceV1 implements BasketService {
 
     public BasketItem getItemFromBasket(Basket basket, Long productId) {
         return basket.getItems().get(productId);
-    }
-
-    public BasketStatus checkBasketStatus(Long basketId) {
-        Optional<Basket> optionalBasket = basketRepository.findById(basketId);
-        if (optionalBasket.isEmpty()) {
-            throw new BasketNotFoundException();
-        }
-        Basket basket = optionalBasket.get();
-        return basket.getStatus();
     }
 
     public boolean isItemInTheBasket(Basket basket, Long productId) {
@@ -213,5 +203,28 @@ public class BasketServiceV1 implements BasketService {
             throw new ItemNotFoundException();
         }
         return getItemFromBasket(basket, productId);
+    }
+
+    public boolean compareAddItemRequestWithBasket (AddItemRequest request, Basket basket){
+        if(!basket.getId().equals(request.getBasketId())){
+            return false;
+        }
+        if(!basket.getSessionId().equals(request.getSessionId())){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean compareAddItemRequestWithItem(AddItemRequest request, BasketItem item){
+        if(!item.getProductPrice().equals(request.getProductPrice())){
+            return false;
+        }
+        if(!item.getProductImage().equals(request.getProductImage())){
+            return false;
+        }
+        if(!item.getProductInfo().equals(request.getProductInfo())){
+            return false;
+        }
+        return true;
     }
 }
