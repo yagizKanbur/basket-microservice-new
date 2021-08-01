@@ -41,30 +41,20 @@ public class BasketServiceV1 implements BasketService {
             throw new BasketAlreadyOrderedException();
         }
         Basket basket = optionalBasket.get();
-
-        Long productId = request.getProductId();
-        if (isItemInTheBasket(basket, productId)) {
-            basket.increaseItemQuantity(productId);
-            return basketRepository.save(basket);
+        if (!isItemInTheBasket(basket, request.getProductId())) {
+            throw new ItemNotFoundException();
         }
-        return basket;
+
+        basket.increaseItemQuantity(request.getProductId());
+        return basketRepository.save(basket);
+
     }
 
     @Override
     public Basket decreaseQuantity(ChangeQuantityRequest request) {
         Optional<Basket> optionalBasket = basketRepository.findById(request.getBasketId());
-        if (optionalBasket.isEmpty()) {
-            throw new BasketNotFoundException();
-        }
-        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
-            throw new BasketAlreadyOrderedException();
-        }
-        Basket basket = optionalBasket.get();
-
-        if (!isItemInTheBasket(basket, request.getProductId())) {
-            throw new ItemNotFoundException();
-        }
-        BasketItem item = getItemFromBasket(basket, request.getProductId());
+        Basket basket = getBasketIfValid(optionalBasket);
+        BasketItem item = getItemFromBasketIfExists(basket,request.getProductId());
 
         if (item.getQuantity() == 1) {
             ItemRequest removeRequest = ItemRequest.builder()
@@ -208,13 +198,20 @@ public class BasketServiceV1 implements BasketService {
         return false;
     }
 
-    public boolean checkBasketValidation(Optional<Basket> optionalBasket){
+    public Basket getBasketIfValid (Optional<Basket> optionalBasket){
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
         }
         if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
             throw new BasketAlreadyOrderedException();
         }
-        return true;
+        return optionalBasket.get();
+    }
+
+    public BasketItem getItemFromBasketIfExists (Basket basket, Long productId){
+        if (!isItemInTheBasket(basket, productId)) {
+            throw new ItemNotFoundException();
+        }
+        return getItemFromBasket(basket, productId);
     }
 }
