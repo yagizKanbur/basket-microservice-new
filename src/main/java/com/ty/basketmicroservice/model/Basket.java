@@ -63,37 +63,32 @@ public class Basket {
     }
 
     public void addItem(BasketItem item) {
-        this.calculatePrice(item);
         this.getItems().putIfAbsent(item.getProductId(), item);
+        this.calculatePrice(item);
     }
 
-    public void removeItem(Long productId) {
-        BasketItem item = this.getItems().get(productId);
-        this.getItems().remove(productId);
+    public void removeItem(BasketItem item) {
+        this.getItems().remove(item.getProductId());
         calculatePriceAfterRemovingItem(item);
     }
 
-    public void increaseItemQuantity(Long productId) {
-        BasketItem item = this.getItems().get(productId);
+    public void increaseItemQuantity(BasketItem item) {
         item.increaseQuantity();
-        calculatePrice(item);
+        this.info.calculatePrice(item);
     }
 
-    public void decreaseItemQuantity(Long productId) {
-        BasketItem item = this.getItems().get(productId);
+    public void decreaseItemQuantity(BasketItem item) {
         item.decreaseQuantity();
         calculatePriceAfterDecreaseInQuantity(item);
     }
 
-    public void changeItemQuantity(Long productId, int newQuantity) {
-        BasketItem item = this.getItems().get(productId);
+    public void changeItemQuantity(BasketItem item, int newQuantity) {
         int changeInQuantity = newQuantity - item.getQuantity();
         item.setQuantity(newQuantity);
         calculatePriceAfterChangingQuantity(item, changeInQuantity);
     }
 
-    public void reverseBasketItemStatus(Long productId) {
-        BasketItem item = this.getItems().get(productId);
+    public void reverseBasketItemStatus(BasketItem item) {
         item.reverseBasketItemStatus();
         calculatePriceAfterChangingCheckboxStatus(item, item.getStatus());
     }
@@ -108,24 +103,40 @@ public class Basket {
             info.setSumOfProductPrices(newPrice);
         }
         info.setTotalPrice();
+
+        if(info.getSumOfProductPrices()>60 && !info.isFreeShipping()){
+            makeShippingFree();
+        }
     }
 
     public void calculatePriceAfterDecreaseInQuantity(BasketItem item) {
         Double newPrice = info.getSumOfProductPrices() - item.getProductPrice();
         info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
+        if(info.getSumOfProductPrices()<=60 && info.isFreeShipping()){
+            makeShippingPaidFor();
+        }
     }
 
     public void calculatePriceAfterChangingQuantity(BasketItem item, int changeInQuantity) {
         Double newPrice = info.getSumOfProductPrices() + item.getProductPrice() * changeInQuantity;
         info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
+        if(info.getSumOfProductPrices()<=60 && info.isFreeShipping()){
+            makeShippingPaidFor();
+        }
+        if(info.getSumOfProductPrices()>60 && !info.isFreeShipping()){
+            makeShippingFree();
+        }
     }
 
     public void calculatePriceAfterRemovingItem(BasketItem item) {
         Double newPrice = info.getSumOfProductPrices() - item.getProductPrice() * item.getQuantity();
         info.setSumOfProductPrices(newPrice);
         info.setTotalPrice();
+        if(info.getSumOfProductPrices()<=60 && info.isFreeShipping()){
+            makeShippingPaidFor();
+        }
     }
 
     public void calculatePriceAfterChangingCheckboxStatus(BasketItem item, BasketItemStatus status) {
@@ -138,6 +149,24 @@ public class Basket {
             info.setSumOfProductPrices(newPrice);
             info.setTotalPrice();
         }
+        if(info.getSumOfProductPrices()<=60 && info.isFreeShipping()){
+            makeShippingPaidFor();
+        }
+        if(info.getSumOfProductPrices()>60 && !info.isFreeShipping()){
+            makeShippingFree();
+        }
+    }
+
+    public void makeShippingFree(){
+        info.setSumOfShippingPrices(info.getSumOfShippingPrices()-11.99);
+        info.setFreeShipping(true);
+        info.setTotalPrice();
+    }
+
+    public void makeShippingPaidFor(){
+        info.setSumOfShippingPrices(info.getSumOfShippingPrices()+11.99);
+        info.setFreeShipping(false);
+        info.setTotalPrice();
     }
 
 

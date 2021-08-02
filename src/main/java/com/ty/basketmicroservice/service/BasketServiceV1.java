@@ -35,7 +35,7 @@ public class BasketServiceV1 implements BasketService {
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
         }
-        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             throw new BasketAlreadyOrderedException();
         }
         Basket basket = optionalBasket.get();
@@ -44,7 +44,7 @@ public class BasketServiceV1 implements BasketService {
         }
 
         BasketItem item = getItemFromBasket(basket, request.getProductId());
-        basket.increaseItemQuantity(item.getProductId());
+        basket.increaseItemQuantity(item);
         return basketRepository.save(basket);
     }
 
@@ -54,7 +54,7 @@ public class BasketServiceV1 implements BasketService {
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
         }
-        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             throw new BasketAlreadyOrderedException();
         }
         Basket basket = optionalBasket.get();
@@ -68,30 +68,34 @@ public class BasketServiceV1 implements BasketService {
             return removeItem(request);
         }
 
-        basket.decreaseItemQuantity(item.getProductId());
+        basket.decreaseItemQuantity(item);
         return basketRepository.save(basket);
     }
 
     @Override
     public Basket changeQuantity(ChangeQuantityRequest request) {
-        if(request.getQuantity()<=0){
+        if (request.getQuantity() <= 0) {
             throw new NegativeQuantityException();
         }
 
         Optional<Basket> optionalBasket = basketRepository.findById(request.getBasketId());
+
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
         }
-        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             throw new BasketAlreadyOrderedException();
         }
+
         Basket basket = optionalBasket.get();
+
         if (!isItemInTheBasket(basket, request.getProductId())) {
             throw new ItemNotFoundException();
         }
+
         BasketItem item = getItemFromBasket(basket, request.getProductId());
 
-        basket.changeItemQuantity(item.getProductId(), request.getQuantity());
+        basket.changeItemQuantity(item, request.getQuantity());
         return basketRepository.save(basket);
     }
 
@@ -103,20 +107,20 @@ public class BasketServiceV1 implements BasketService {
 
         if (optionalBasket.isEmpty() || BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             Basket createdBasket = createBasket(request);
-            kafkaTemplate.send(CREATE_TOPIC, JSON.toJSONString(createdBasket, false));
+            //kafkaTemplate.send(CREATE_TOPIC, JSON.toJSONString(createdBasket, false));
             return basketRepository.save(createdBasket);
         }
 
         Basket basket = optionalBasket.get();
 
-        if(!compareAddItemRequestWithBasket(request,basket)){
+        if (!compareAddItemRequestWithBasket(request, basket)) {
             throw new RequestMismatchedWithBasketDataException();
         }
 
         if (basket.getItems().containsKey(request.getProductId())) {
-            BasketItem item = getItemFromBasket(basket,request.getProductId());
+            BasketItem item = getItemFromBasket(basket, request.getProductId());
 
-            if(!compareAddItemRequestWithItem(request,item)){
+            if (!compareAddItemRequestWithItem(request, item)) {
                 throw new RequestMismatchedWithBasketDataException();
             }
 
@@ -130,7 +134,7 @@ public class BasketServiceV1 implements BasketService {
         BasketItem item = new BasketItem(request);
 
         basket.addItem(item);
-        kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
+        //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
 
@@ -140,7 +144,7 @@ public class BasketServiceV1 implements BasketService {
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
         }
-        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             throw new BasketAlreadyOrderedException();
         }
         Basket basket = optionalBasket.get();
@@ -149,7 +153,7 @@ public class BasketServiceV1 implements BasketService {
         }
         BasketItem item = getItemFromBasket(basket, request.getProductId());
 
-        basket.removeItem(item.getProductId());
+        basket.removeItem(item);
         //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
@@ -160,7 +164,7 @@ public class BasketServiceV1 implements BasketService {
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
         }
-        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             throw new BasketAlreadyOrderedException();
         }
         Basket basket = optionalBasket.get();
@@ -169,7 +173,7 @@ public class BasketServiceV1 implements BasketService {
         }
 
         BasketItem item = getItemFromBasket(basket, request.getProductId());
-        basket.reverseBasketItemStatus(item.getProductId());
+        basket.reverseBasketItemStatus(item);
         return basketRepository.save(basket);
     }
 
@@ -179,7 +183,7 @@ public class BasketServiceV1 implements BasketService {
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
         }
-        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             throw new BasketAlreadyOrderedException();
         }
         Basket basket = optionalBasket.get();
@@ -211,24 +215,24 @@ public class BasketServiceV1 implements BasketService {
         return false;
     }
 
-    public boolean compareAddItemRequestWithBasket (AddItemRequest request, Basket basket){
-        if(!basket.getId().equals(request.getBasketId())){
+    public boolean compareAddItemRequestWithBasket(AddItemRequest request, Basket basket) {
+        if (!basket.getId().equals(request.getBasketId())) {
             return false;
         }
-        if(!basket.getSessionId().equals(request.getSessionId())){
+        if (!basket.getSessionId().equals(request.getSessionId())) {
             return false;
         }
         return true;
     }
 
-    public boolean compareAddItemRequestWithItem(AddItemRequest request, BasketItem item){
-        if(!item.getProductPrice().equals(request.getProductPrice())){
+    public boolean compareAddItemRequestWithItem(AddItemRequest request, BasketItem item) {
+        if (!item.getProductPrice().equals(request.getProductPrice())) {
             return false;
         }
-        if(!item.getProductImage().equals(request.getProductImage())){
+        if (!item.getProductImage().equals(request.getProductImage())) {
             return false;
         }
-        if(!item.getProductInfo().equals(request.getProductInfo())){
+        if (!item.getProductInfo().equals(request.getProductInfo())) {
             return false;
         }
         return true;

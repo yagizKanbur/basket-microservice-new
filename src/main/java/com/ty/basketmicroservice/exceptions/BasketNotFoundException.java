@@ -4,6 +4,6 @@ import org.springframework.http.HttpStatus;
 
 public class BasketNotFoundException extends BasketException{
     public BasketNotFoundException(){
-        super(HttpStatus.BAD_REQUEST,"Basket not found");
+        super(HttpStatus.NOT_FOUND,"Basket not found");
     }
 }

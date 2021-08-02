@@ -16,13 +16,39 @@ public class BasketInfo {
     private Double sumOfShippingPrices;
     @Field
     private Double totalPrice;
+    @Field
+    private boolean isFreeShipping;
 
     public BasketInfo(){
-        sumOfShippingPrices= 4.0;
+        sumOfShippingPrices= 11.99;
+        isFreeShipping = false;
         totalPrice = sumOfShippingPrices;
     }
 
     public void setTotalPrice() {
         this.totalPrice = sumOfProductPrices +  sumOfShippingPrices;
     }
+
+    //*************************************************************************
+
+    public void calculatePrice(BasketItem item) {
+        if (this.getSumOfProductPrices() == null) {
+            this.setSumOfProductPrices(item.getProductPrice());
+        } else {
+            Double newPrice = item.getProductPrice() + this.getSumOfProductPrices();
+            this.setSumOfProductPrices(newPrice);
+        }
+        this.setTotalPrice();
+
+        if(this.getSumOfProductPrices()>60 && !this.isFreeShipping()){
+            makeShippingFree();
+        }
+    }
+
+    public void makeShippingFree(){
+        this.setSumOfShippingPrices(this.getSumOfShippingPrices()-11.99);
+        this.setFreeShipping(true);
+        this.setTotalPrice();
+    }
+
 }
