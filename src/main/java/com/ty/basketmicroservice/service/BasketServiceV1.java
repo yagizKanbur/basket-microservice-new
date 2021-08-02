@@ -22,7 +22,7 @@ import java.util.Optional;
 public class BasketServiceV1 implements BasketService {
     private static final String UPDATE_TOPIC = "basket.update";
     private static final String CREATE_TOPIC = "basket.create";
-    private static final String DELETE_TOPIC = "basket.delete";
+    private static final String ORDER_TOPIC = "basket.order";
 
     // REFLECTION
 
@@ -32,8 +32,18 @@ public class BasketServiceV1 implements BasketService {
     @Override
     public Basket increaseQuantity(ItemRequest request) {
         Optional<Basket> optionalBasket = basketRepository.findById(request.getBasketId());
-        Basket basket = getBasketIfValid(optionalBasket);
-        BasketItem item = getItemFromBasketIfExists(basket,request.getProductId());
+        if (optionalBasket.isEmpty()) {
+            throw new BasketNotFoundException();
+        }
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+            throw new BasketAlreadyOrderedException();
+        }
+        Basket basket = optionalBasket.get();
+        if (!isItemInTheBasket(basket, request.getProductId())) {
+            throw new ItemNotFoundException();
+        }
+
+        BasketItem item = getItemFromBasket(basket, request.getProductId());
         basket.increaseItemQuantity(item.getProductId());
         return basketRepository.save(basket);
     }
@@ -41,8 +51,18 @@ public class BasketServiceV1 implements BasketService {
     @Override
     public Basket decreaseQuantity(ItemRequest request) {
         Optional<Basket> optionalBasket = basketRepository.findById(request.getBasketId());
-        Basket basket = getBasketIfValid(optionalBasket);
-        BasketItem item = getItemFromBasketIfExists(basket,request.getProductId());
+        if (optionalBasket.isEmpty()) {
+            throw new BasketNotFoundException();
+        }
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+            throw new BasketAlreadyOrderedException();
+        }
+        Basket basket = optionalBasket.get();
+        if (!isItemInTheBasket(basket, request.getProductId())) {
+            throw new ItemNotFoundException();
+        }
+
+        BasketItem item = getItemFromBasket(basket, request.getProductId());
 
         if (item.getQuantity() == 1) {
             return removeItem(request);
@@ -62,6 +82,9 @@ public class BasketServiceV1 implements BasketService {
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
         }
+        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
+            throw new BasketAlreadyOrderedException();
+        }
         Basket basket = optionalBasket.get();
         if (!isItemInTheBasket(basket, request.getProductId())) {
             throw new ItemNotFoundException();
@@ -80,7 +103,7 @@ public class BasketServiceV1 implements BasketService {
 
         if (optionalBasket.isEmpty() || BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             Basket createdBasket = createBasket(request);
-            //kafkaTemplate.send(CREATE_TOPIC, JSON.toJSONString(createdBasket, false));
+            kafkaTemplate.send(CREATE_TOPIC, JSON.toJSONString(createdBasket, false));
             return basketRepository.save(createdBasket);
         }
 
@@ -107,7 +130,7 @@ public class BasketServiceV1 implements BasketService {
         BasketItem item = new BasketItem(request);
 
         basket.addItem(item);
-        //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
+        kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
 
@@ -161,7 +184,7 @@ public class BasketServiceV1 implements BasketService {
         }
         Basket basket = optionalBasket.get();
         basket.changeBasketStatus();
-        //kafkaTemplate.send(, JSON.toJSONString(basket, false));
+        //kafkaTemplate.send(ORDER_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
 
@@ -186,23 +209,6 @@ public class BasketServiceV1 implements BasketService {
             return true;
         }
         return false;
-    }
-
-    public Basket getBasketIfValid (Optional<Basket> optionalBasket){
-        if (optionalBasket.isEmpty()) {
-            throw new BasketNotFoundException();
-        }
-        if (BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())){
-            throw new BasketAlreadyOrderedException();
-        }
-        return optionalBasket.get();
-    }
-
-    public BasketItem getItemFromBasketIfExists (Basket basket, Long productId){
-        if (!isItemInTheBasket(basket, productId)) {
-            throw new ItemNotFoundException();
-        }
-        return getItemFromBasket(basket, productId);
     }
 
     public boolean compareAddItemRequestWithBasket (AddItemRequest request, Basket basket){
