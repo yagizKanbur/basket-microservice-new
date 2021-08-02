@@ -32,11 +32,6 @@ public class Basket {
     private BasketStatus status;
 
     public Basket() {
-        this.items = new HashMap<>();
-        this.info = new BasketInfo();
-        this.status = BasketStatus.PENDING;
-        Date date = new Date();
-        this.creationDate = date.getTime();
     }
 
     public Basket(AddItemRequest request) {
@@ -64,110 +59,39 @@ public class Basket {
 
     public void addItem(BasketItem item) {
         this.getItems().putIfAbsent(item.getProductId(), item);
-        this.calculatePrice(item);
+        this.info.calculatePrice(item);
     }
 
     public void removeItem(BasketItem item) {
         this.getItems().remove(item.getProductId());
-        calculatePriceAfterRemovingItem(item);
+        this.info.calculatePriceAfterRemovingItem(item);
     }
 
     public void increaseItemQuantity(BasketItem item) {
         item.increaseQuantity();
-        this.info.calculatePrice(item);
+        if(BasketItemStatus.CHECKED.equals(item.getStatus())){
+            this.info.calculatePrice(item);
+        }
     }
 
     public void decreaseItemQuantity(BasketItem item) {
         item.decreaseQuantity();
-        calculatePriceAfterDecreaseInQuantity(item);
+        if(BasketItemStatus.CHECKED.equals(item.getStatus())){
+            this.info.calculatePriceAfterDecreaseInQuantity(item);
+        }
     }
 
     public void changeItemQuantity(BasketItem item, int newQuantity) {
         int changeInQuantity = newQuantity - item.getQuantity();
         item.setQuantity(newQuantity);
-        calculatePriceAfterChangingQuantity(item, changeInQuantity);
+        if(BasketItemStatus.CHECKED.equals(item.getStatus())){
+            this.info.calculatePriceAfterChangingQuantity(item, changeInQuantity);
+        }
     }
 
     public void reverseBasketItemStatus(BasketItem item) {
         item.reverseBasketItemStatus();
-        calculatePriceAfterChangingCheckboxStatus(item, item.getStatus());
+        this.info.calculatePriceAfterChangingCheckboxStatus(item, item.getStatus());
     }
-
-    //****************** Price Calculation Methods *******************************
-
-    public void calculatePrice(BasketItem item) {
-        if (info.getSumOfProductPrices() == null) {
-            info.setSumOfProductPrices(item.getProductPrice());
-        } else {
-            Double newPrice = item.getProductPrice() + info.getSumOfProductPrices();
-            info.setSumOfProductPrices(newPrice);
-        }
-        info.setTotalPrice();
-
-        if(info.getSumOfProductPrices()>60 && !info.isFreeShipping()){
-            makeShippingFree();
-        }
-    }
-
-    public void calculatePriceAfterDecreaseInQuantity(BasketItem item) {
-        Double newPrice = info.getSumOfProductPrices() - item.getProductPrice();
-        info.setSumOfProductPrices(newPrice);
-        info.setTotalPrice();
-        if(info.getSumOfProductPrices()<=60 && info.isFreeShipping()){
-            makeShippingPaidFor();
-        }
-    }
-
-    public void calculatePriceAfterChangingQuantity(BasketItem item, int changeInQuantity) {
-        Double newPrice = info.getSumOfProductPrices() + item.getProductPrice() * changeInQuantity;
-        info.setSumOfProductPrices(newPrice);
-        info.setTotalPrice();
-        if(info.getSumOfProductPrices()<=60 && info.isFreeShipping()){
-            makeShippingPaidFor();
-        }
-        if(info.getSumOfProductPrices()>60 && !info.isFreeShipping()){
-            makeShippingFree();
-        }
-    }
-
-    public void calculatePriceAfterRemovingItem(BasketItem item) {
-        Double newPrice = info.getSumOfProductPrices() - item.getProductPrice() * item.getQuantity();
-        info.setSumOfProductPrices(newPrice);
-        info.setTotalPrice();
-        if(info.getSumOfProductPrices()<=60 && info.isFreeShipping()){
-            makeShippingPaidFor();
-        }
-    }
-
-    public void calculatePriceAfterChangingCheckboxStatus(BasketItem item, BasketItemStatus status) {
-        if (BasketItemStatus.CHECKED.equals(status)) {
-            Double newPrice = info.getSumOfProductPrices() + item.getProductPrice() * item.getQuantity();
-            info.setSumOfProductPrices(newPrice);
-            info.setTotalPrice();
-        } else if (BasketItemStatus.UNCHECKED.equals(status)) {
-            Double newPrice = info.getSumOfProductPrices() - item.getProductPrice() * item.getQuantity();
-            info.setSumOfProductPrices(newPrice);
-            info.setTotalPrice();
-        }
-        if(info.getSumOfProductPrices()<=60 && info.isFreeShipping()){
-            makeShippingPaidFor();
-        }
-        if(info.getSumOfProductPrices()>60 && !info.isFreeShipping()){
-            makeShippingFree();
-        }
-    }
-
-    public void makeShippingFree(){
-        info.setSumOfShippingPrices(info.getSumOfShippingPrices()-11.99);
-        info.setFreeShipping(true);
-        info.setTotalPrice();
-    }
-
-    public void makeShippingPaidFor(){
-        info.setSumOfShippingPrices(info.getSumOfShippingPrices()+11.99);
-        info.setFreeShipping(false);
-        info.setTotalPrice();
-    }
-
 
 }

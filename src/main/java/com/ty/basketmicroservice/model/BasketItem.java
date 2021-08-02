@@ -33,15 +33,6 @@ public class BasketItem {
     public BasketItem() {
     }
 
-    public BasketItem(AddItemRequest request) {
-        this.productId = request.getProductId();
-        this.productImage = request.getProductImage();
-        this.productInfo = request.getProductInfo();
-        this.productPrice = request.getProductPrice();
-        this.quantity = 1;
-        this.status = BasketItemStatus.CHECKED;
-    }
-
     public void increaseQuantity() {
         quantity++;
     }

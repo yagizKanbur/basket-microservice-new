@@ -1,6 +1,7 @@
 package com.ty.basketmicroservice.service;
 
 import com.alibaba.fastjson.JSON;
+import com.ty.basketmicroservice.enums.BasketItemStatus;
 import com.ty.basketmicroservice.exceptions.*;
 import com.ty.basketmicroservice.model.Basket;
 import com.ty.basketmicroservice.model.BasketInfo;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Optional;
 
 @Service
@@ -23,6 +26,7 @@ public class BasketServiceV1 implements BasketService {
     private static final String UPDATE_TOPIC = "basket.update";
     private static final String CREATE_TOPIC = "basket.create";
     private static final String ORDER_TOPIC = "basket.order";
+    private static final int DEFAULT_STARTING_QUANTITY = 1;
 
     // REFLECTION
 
@@ -131,7 +135,8 @@ public class BasketServiceV1 implements BasketService {
             return increaseQuantity(itemRequest);
         }
 
-        BasketItem item = new BasketItem(request);
+        BasketItem item = new BasketItem();
+        mapRequestToItem(item,request);
 
         basket.addItem(item);
         //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
@@ -194,9 +199,11 @@ public class BasketServiceV1 implements BasketService {
 
     // *********************************************************************
 
-    public Basket createBasket(AddItemRequest request) {
-        Basket basket = new Basket(request);
-        BasketItem item = new BasketItem(request);
+    private Basket createBasket(AddItemRequest request) {
+        Basket basket = new Basket();
+        mapRequestToBasket(basket,request);
+        BasketItem item = new BasketItem();
+        mapRequestToItem(item,request);
         BasketInfo info = new BasketInfo();
 
         basket.setInfo(info);
@@ -204,18 +211,36 @@ public class BasketServiceV1 implements BasketService {
         return basket;
     }
 
-    public BasketItem getItemFromBasket(Basket basket, Long productId) {
+    private void mapRequestToBasket(Basket basket, AddItemRequest request){
+        basket.setId(request.getBasketId());
+        basket.setSessionId(request.getSessionId());
+        basket.setItems(new HashMap<>());
+        basket.setStatus(BasketStatus.PENDING);
+        Date date = new Date();
+        basket.setCreationDate(date.getTime());
+    }
+
+    private void mapRequestToItem(BasketItem item, AddItemRequest request){
+        item.setProductId(request.getProductId());
+        item.setQuantity(DEFAULT_STARTING_QUANTITY);
+        item.setProductPrice(request.getProductPrice());
+        item.setProductImage(request.getProductImage());
+        item.setProductInfo(request.getProductInfo());
+        item.setStatus(BasketItemStatus.CHECKED);
+    }
+
+    private BasketItem getItemFromBasket(Basket basket, Long productId) {
         return basket.getItems().get(productId);
     }
 
-    public boolean isItemInTheBasket(Basket basket, Long productId) {
+    private boolean isItemInTheBasket(Basket basket, Long productId) {
         if (basket.getItems().get(productId) != null) {
             return true;
         }
         return false;
     }
 
-    public boolean compareAddItemRequestWithBasket(AddItemRequest request, Basket basket) {
+    private boolean compareAddItemRequestWithBasket(AddItemRequest request, Basket basket) {
         if (!basket.getId().equals(request.getBasketId())) {
             return false;
         }
@@ -225,7 +250,7 @@ public class BasketServiceV1 implements BasketService {
         return true;
     }
 
-    public boolean compareAddItemRequestWithItem(AddItemRequest request, BasketItem item) {
+    private boolean compareAddItemRequestWithItem(AddItemRequest request, BasketItem item) {
         if (!item.getProductPrice().equals(request.getProductPrice())) {
             return false;
         }

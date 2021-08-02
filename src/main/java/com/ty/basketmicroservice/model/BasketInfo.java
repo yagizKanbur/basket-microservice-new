@@ -1,5 +1,6 @@
 package com.ty.basketmicroservice.model;
 
+import com.ty.basketmicroservice.enums.BasketItemStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.couchbase.core.mapping.Document;
@@ -19,14 +20,14 @@ public class BasketInfo {
     @Field
     private boolean isFreeShipping;
 
-    public BasketInfo(){
-        sumOfShippingPrices= 11.99;
+    public BasketInfo() {
+        sumOfShippingPrices = 12.00;
         isFreeShipping = false;
         totalPrice = sumOfShippingPrices;
     }
 
     public void setTotalPrice() {
-        this.totalPrice = sumOfProductPrices +  sumOfShippingPrices;
+        this.totalPrice = sumOfProductPrices + sumOfShippingPrices;
     }
 
     //*************************************************************************
@@ -40,14 +41,68 @@ public class BasketInfo {
         }
         this.setTotalPrice();
 
-        if(this.getSumOfProductPrices()>60 && !this.isFreeShipping()){
+        if (this.getSumOfProductPrices() > 60 && !this.isFreeShipping()) {
             makeShippingFree();
         }
     }
 
-    public void makeShippingFree(){
-        this.setSumOfShippingPrices(this.getSumOfShippingPrices()-11.99);
+    public void calculatePriceAfterDecreaseInQuantity(BasketItem item) {
+        Double newPrice = this.getSumOfProductPrices() - item.getProductPrice();
+        this.setSumOfProductPrices(newPrice);
+        this.setTotalPrice();
+        if (this.getSumOfProductPrices() <= 60 && this.isFreeShipping()) {
+            makeShippingPaidFor();
+        }
+    }
+
+    public void calculatePriceAfterChangingQuantity(BasketItem item, int changeInQuantity) {
+        Double newPrice = this.getSumOfProductPrices() + item.getProductPrice() * changeInQuantity;
+        this.setSumOfProductPrices(newPrice);
+        this.setTotalPrice();
+        if (this.getSumOfProductPrices() <= 60 && this.isFreeShipping()) {
+            makeShippingPaidFor();
+        }
+        if (this.getSumOfProductPrices() > 60 && !this.isFreeShipping()) {
+            makeShippingFree();
+        }
+    }
+
+    public void calculatePriceAfterRemovingItem(BasketItem item) {
+        Double newPrice = this.getSumOfProductPrices() - item.getProductPrice() * item.getQuantity();
+        this.setSumOfProductPrices(newPrice);
+        this.setTotalPrice();
+        if (this.getSumOfProductPrices() <= 60 && this.isFreeShipping()) {
+            makeShippingPaidFor();
+        }
+    }
+
+    public void calculatePriceAfterChangingCheckboxStatus(BasketItem item, BasketItemStatus status) {
+        if (BasketItemStatus.CHECKED.equals(status)) {
+            Double newPrice = this.getSumOfProductPrices() + item.getProductPrice() * item.getQuantity();
+            this.setSumOfProductPrices(newPrice);
+            this.setTotalPrice();
+        } else if (BasketItemStatus.UNCHECKED.equals(status)) {
+            Double newPrice = this.getSumOfProductPrices() - item.getProductPrice() * item.getQuantity();
+            this.setSumOfProductPrices(newPrice);
+            this.setTotalPrice();
+        }
+        if (this.getSumOfProductPrices() <= 60 && this.isFreeShipping()) {
+            makeShippingPaidFor();
+        }
+        if (this.getSumOfProductPrices() > 60 && !this.isFreeShipping()) {
+            makeShippingFree();
+        }
+    }
+
+    public void makeShippingFree() {
+        this.setSumOfShippingPrices(this.getSumOfShippingPrices() - 12.00);
         this.setFreeShipping(true);
+        this.setTotalPrice();
+    }
+
+    public void makeShippingPaidFor() {
+        this.setSumOfShippingPrices(this.getSumOfShippingPrices() + 12.00);
+        this.setFreeShipping(false);
         this.setTotalPrice();
     }
 
