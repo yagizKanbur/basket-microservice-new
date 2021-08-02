@@ -35,7 +35,7 @@ services:
   basket-microservice-new:
     build: .
     ports:
-      - 8887:8887
+      - 8080:8080
     restart: always
     depends_on:
       - couchbase
