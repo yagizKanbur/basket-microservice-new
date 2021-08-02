@@ -1,5 +1,6 @@
 package com.ty.basketmicroservice.service;
 
+import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
 import com.ty.basketmicroservice.enums.BasketStatus;
@@ -154,6 +155,11 @@ class BasketServiceV1Test {
         Mockito.when(basketRepository.findById(any())).thenReturn(java.util.Optional.of(basket));
         Exception exception = assertThrows(ItemNotFoundException.class, () -> basketService.decreaseQuantity(itemRequest));
         assertEquals(ItemNotFoundException.class, exception.getClass());
+    }
+
+    @Test
+    void decreaseQuantity_givenQuantityEqualsToOne_shouldCallRemoveItem(){
+
     }
 
     @Test
@@ -363,6 +369,7 @@ class BasketServiceV1Test {
 
         assertEquals(BasketStatus.ORDERED,orderedBasket.getStatus());
     }
+
 
 
 

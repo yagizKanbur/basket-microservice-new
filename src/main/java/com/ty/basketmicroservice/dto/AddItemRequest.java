@@ -1,10 +1,12 @@
 package com.ty.basketmicroservice.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class AddItemRequest {
     private Long basketId;
     private Long sessionId;
@@ -13,6 +15,4 @@ public class AddItemRequest {
     private String productInfo;
     private Double productPrice;
 
-    public AddItemRequest() {
-    }
 }

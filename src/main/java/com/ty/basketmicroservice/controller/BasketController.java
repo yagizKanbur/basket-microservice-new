@@ -3,10 +3,8 @@ package com.ty.basketmicroservice.controller;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
-import com.ty.basketmicroservice.enums.BasketStatus;
 import com.ty.basketmicroservice.service.BasketServiceV1;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,7 +46,6 @@ public class BasketController {
 
     @PutMapping("/order")
     public ResponseEntity<?> completeOrder(@RequestBody Long basketId) {
-        // Todo : request problem check later
         return ResponseEntity.ok(basketService.completeOrder(basketId));
     }
 }
