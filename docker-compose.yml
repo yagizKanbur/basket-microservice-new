@@ -33,9 +33,10 @@ services:
       - 11210-11211:11210-11211
 
   basket-microservice:
-    build: .
+    build: docker/basket-microservice
+    container_name: basket-microservice
     ports:
-      - 8085:8085
+      - 8082:8080
     restart: always
     depends_on:
       - couchbase
