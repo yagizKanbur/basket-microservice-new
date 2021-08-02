@@ -1,12 +1,9 @@
-container=$1
-
-if [ "$container" -eq '' ]
-then
-  echo 'Please input a container id'
-  exit
-else
-  echo 'Container captured=' $container
-fi
+echo 'Couchbase preperation started..'
+res=`docker ps | grep couchbase`
+read -ra arr <<<"$res"
+echo $arr
+# prepare couchbase
+container=$arr
 
 docker exec -t $container couchbase-cli cluster-init --cluster-name basket-microservice-cluster \
    --cluster-username Administrator --cluster-password password --services data,index,query,fts,eventing,analytics \
