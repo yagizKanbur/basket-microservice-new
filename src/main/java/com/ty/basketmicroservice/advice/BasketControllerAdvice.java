@@ -1,9 +1,6 @@
 package com.ty.basketmicroservice.advice;
 
-import com.ty.basketmicroservice.exceptions.BasketNotFoundException;
-import com.ty.basketmicroservice.exceptions.ItemNotFoundException;
-import com.ty.basketmicroservice.exceptions.NegativeQuantityException;
-import com.ty.basketmicroservice.exceptions.RequestMismatchedWithBasketDataException;
+import com.ty.basketmicroservice.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.KafkaException;
 import org.springframework.http.HttpStatus;
@@ -64,6 +61,11 @@ public class BasketControllerAdvice {
     @ExceptionHandler(NegativeQuantityException.class)
     public ResponseEntity<String> handleNegativeQuantityException (NegativeQuantityException e){
         log.info(e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(NegativePriceException.class)
+    public ResponseEntity<String> handleNegativePriceException (NegativePriceException e){
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 

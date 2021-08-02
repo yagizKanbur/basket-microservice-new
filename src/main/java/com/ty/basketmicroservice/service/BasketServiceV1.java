@@ -106,6 +106,9 @@ public class BasketServiceV1 implements BasketService {
     @Override
     public Basket addItem(AddItemRequest request) {
         // Todo: Create basket if there is no basket id in the request
+        if(request.getProductPrice() <= 0){
+            throw new NegativePriceException();
+        }
 
         Optional<Basket> optionalBasket = basketRepository.findById(request.getBasketId());
 
