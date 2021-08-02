@@ -26,7 +26,6 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 
 @ExtendWith(MockitoExtension.class)
 class BasketServiceV1Test {

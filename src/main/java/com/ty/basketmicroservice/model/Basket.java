@@ -18,8 +18,7 @@ import java.util.*;
 @Getter
 @Setter
 public class Basket {
-    @Id
-    @GeneratedValue(strategy = GenerationStrategy.UNIQUE)
+    @Id @GeneratedValue(strategy = GenerationStrategy.UNIQUE)
     private Long id;
     @Field
     private Long sessionId;
