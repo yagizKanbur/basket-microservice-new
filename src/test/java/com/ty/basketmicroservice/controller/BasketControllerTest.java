@@ -40,7 +40,9 @@ class BasketControllerTest {
                 .productId(PRODUCT_ID).productPrice(GENERIC_PRICE)
                 .productImage("str").productInfo("str").build();
 
+
         //this.mockMvc.perform(post("http://localhost:8080/basket/", JSON.toJSONString(request))).andExpect(status().isOk());
+        //this.mockMvc.perform(post("http://localhost:8081/basket/", request.toString())).andExpect(status().isOk());
     }
 
 

@@ -15,4 +15,15 @@ public class AddItemRequest {
     private String productInfo;
     private Double productPrice;
 
+    @Override
+    public String toString() {
+        return "AddItemRequest{" +
+                "basketId=" + basketId +
+                ", sessionId=" + sessionId +
+                ", productId=" + productId +
+                ", productImage='" + productImage + '\'' +
+                ", productInfo='" + productInfo + '\'' +
+                ", productPrice=" + productPrice +
+                '}';
+    }
 }

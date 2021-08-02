@@ -142,7 +142,7 @@ public class BasketServiceV1 implements BasketService {
         mapRequestToItem(item,request);
 
         basket.addItem(item);
-        //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
+        //kafkaTemplate.send(CREATE_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
 
