@@ -13,7 +13,10 @@ import com.ty.basketmicroservice.enums.BasketStatus;
 import com.ty.basketmicroservice.repository.BasketRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +34,11 @@ public class BasketServiceV1 implements BasketService {
     private static final int DEFAULT_STARTING_QUANTITY = 1;
 
     // REFLECTION
+
+    @Value("${shippingPrice}")
+    private Double shippingPrice;
+    @Value("${shippingThreshold}")
+    private Double shippingThreshold;
 
     private final BasketRepository basketRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
@@ -208,7 +216,7 @@ public class BasketServiceV1 implements BasketService {
         mapRequestToBasket(basket,request);
         BasketItem item = new BasketItem();
         mapRequestToItem(item,request);
-        BasketInfo info = new BasketInfo();
+        BasketInfo info = new BasketInfo(shippingPrice,shippingThreshold);
 
         basket.setInfo(info);
         basket.addItem(item);
@@ -228,7 +236,7 @@ public class BasketServiceV1 implements BasketService {
     public String generateBasketId(){
         boolean flag = true;
         String uuid = null;
-        while(flag){
+        while(flag) {
             uuid = String.valueOf(UUID.randomUUID());
             Optional<Basket> optionalBasket =  basketRepository.findById(uuid);
             if(optionalBasket.isEmpty()){

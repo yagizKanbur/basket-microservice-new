@@ -36,6 +36,8 @@ class BasketServiceV1Test {
     private static final int INCREASED_QUANTITY = 4;
     private static final int DECREASED_QUANTITY = 2;
     private static final Double GENERIC_PRICE = 4.00;
+    private static final Double SHIPPING_PRICE = 15.00;
+    private static final Double SHIPPING_THRESHOLD = 60.00;
 
     @Before
     public void createMocks(){
@@ -69,7 +71,7 @@ class BasketServiceV1Test {
     }
 
     BasketInfo prepareAndGetBasketInfo(){
-        BasketInfo info = new BasketInfo();
+        BasketInfo info = new BasketInfo(SHIPPING_PRICE,SHIPPING_THRESHOLD);
         info.setSumOfProductPrices(GENERIC_PRICE);
         info.setSumOfShippingPrices(GENERIC_PRICE);
 

@@ -34,16 +34,6 @@ public class Basket {
     public Basket() {
     }
 
-    public Basket(AddItemRequest request) {
-        this.basketId = request.getBasketId();
-        this.sessionId = request.getSessionId();
-        this.items = new HashMap<>();
-        this.info = new BasketInfo();
-        this.status = BasketStatus.PENDING;
-        Date date = new Date();
-        this.creationDate = date.getTime();
-    }
-
     public Map<Long, BasketItem> getItems() {
         //Todo: return Collections.unmodifiableMap(items);
         return items;

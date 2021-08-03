@@ -22,10 +22,13 @@ public class BasketInfo {
     @Field
     private boolean isFreeShipping;
 
-    @Autowired
+    private Double shippingPrice;
+    private Double shippingThreshold;
 
-    public BasketInfo() {
-        sumOfShippingPrices = 12.00;
+    public BasketInfo(Double shippingPrice, Double shippingThreshold) {
+        this.shippingPrice = shippingPrice;
+        this.shippingThreshold = shippingThreshold;
+        this.sumOfShippingPrices = shippingPrice;
         isFreeShipping = false;
         totalPrice = sumOfShippingPrices;
     }
@@ -45,7 +48,7 @@ public class BasketInfo {
         }
         this.setTotalPrice();
 
-        if (this.getSumOfProductPrices() > 60 && !this.isFreeShipping()) {
+        if (this.getSumOfProductPrices() > shippingThreshold && !this.isFreeShipping()) {
             makeShippingFree();
         }
     }
@@ -54,7 +57,7 @@ public class BasketInfo {
         Double newPrice = this.getSumOfProductPrices() - item.getProductPrice();
         this.setSumOfProductPrices(newPrice);
         this.setTotalPrice();
-        if (this.getSumOfProductPrices() <= 60 && this.isFreeShipping()) {
+        if (this.getSumOfProductPrices() <= shippingThreshold && this.isFreeShipping()) {
             makeShippingPaidFor();
         }
     }
@@ -63,10 +66,10 @@ public class BasketInfo {
         Double newPrice = this.getSumOfProductPrices() + item.getProductPrice() * changeInQuantity;
         this.setSumOfProductPrices(newPrice);
         this.setTotalPrice();
-        if (this.getSumOfProductPrices() <= 60 && this.isFreeShipping()) {
+        if (this.getSumOfProductPrices() <= shippingThreshold && this.isFreeShipping()) {
             makeShippingPaidFor();
         }
-        if (this.getSumOfProductPrices() > 60 && !this.isFreeShipping()) {
+        if (this.getSumOfProductPrices() > shippingThreshold && !this.isFreeShipping()) {
             makeShippingFree();
         }
     }
@@ -75,7 +78,7 @@ public class BasketInfo {
         Double newPrice = this.getSumOfProductPrices() - item.getProductPrice() * item.getQuantity();
         this.setSumOfProductPrices(newPrice);
         this.setTotalPrice();
-        if (this.getSumOfProductPrices() <= 60 && this.isFreeShipping()) {
+        if (this.getSumOfProductPrices() <= shippingThreshold && this.isFreeShipping()) {
             makeShippingPaidFor();
         }
     }
@@ -90,22 +93,22 @@ public class BasketInfo {
             this.setSumOfProductPrices(newPrice);
             this.setTotalPrice();
         }
-        if (this.getSumOfProductPrices() <= 60 && this.isFreeShipping()) {
+        if (this.getSumOfProductPrices() <= shippingThreshold && this.isFreeShipping()) {
             makeShippingPaidFor();
         }
-        if (this.getSumOfProductPrices() > 60 && !this.isFreeShipping()) {
+        if (this.getSumOfProductPrices() > shippingThreshold && !this.isFreeShipping()) {
             makeShippingFree();
         }
     }
 
     public void makeShippingFree() {
-        this.setSumOfShippingPrices(this.getSumOfShippingPrices() - 12.00);
+        this.setSumOfShippingPrices(this.getSumOfShippingPrices() - shippingPrice);
         this.setFreeShipping(true);
         this.setTotalPrice();
     }
 
     public void makeShippingPaidFor() {
-        this.setSumOfShippingPrices(this.getSumOfShippingPrices() + 12.00);
+        this.setSumOfShippingPrices(this.getSumOfShippingPrices() + shippingPrice);
         this.setFreeShipping(false);
         this.setTotalPrice();
     }

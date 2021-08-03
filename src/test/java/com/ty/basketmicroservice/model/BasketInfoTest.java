@@ -9,11 +9,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class BasketInfoTest {
     private static final Double GENERIC_PRICE = 20.00;
-
+    private static final Double SHIPPING_PRICE = 15.00;
+    private static final Double SHIPPING_THRESHOLD = 60.00;
 
     @Test
     void calculatePrice_shouldBeSuccess(){
-        BasketInfo info = new BasketInfo();
+        BasketInfo info = new BasketInfo(SHIPPING_PRICE,SHIPPING_THRESHOLD);
         BasketItem item = new BasketItem();
         item.setProductPrice(GENERIC_PRICE);
         info.calculatePrice(item);
@@ -23,7 +24,7 @@ class BasketInfoTest {
 
     @Test
     void calculatePriceAfterDecreaseInQuantity_shouldBeSuccess(){
-        BasketInfo info = new BasketInfo();
+        BasketInfo info = new BasketInfo(SHIPPING_PRICE,SHIPPING_THRESHOLD);
         BasketItem item = new BasketItem();
         item.setProductPrice(GENERIC_PRICE);
         info.setSumOfProductPrices(GENERIC_PRICE);
