@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    restart: always
+    ports:
+      - 2181:2181
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: 'yes'
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    restart: always
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: 'yes'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_CREATE_TOPICS: "product.update:3:1,product.create:3:1,notification:3:1"
+    depends_on:
+      - zookeeper
+
+  # run the setup.sh script
+  couchbase:
+    image: couchbase:latest
+    restart: always
+    ports:
+      - 8091-8094:8091-8094
+      - 11210-11211:11210-11211
+    environment:
+      COUCHBASE_HOST: 127.0.0.1
+      COUCHBASE_CONNECT_TIMEOUT: 45000
+
+  basket-microservice-new:
+    build: .
+    ports:
+      - 8085:8085
+    restart: always
+    environment:
+      COUCHBASE_HOST: 127.0.0.1
+      COUCHBASE_BUCKET: basket
+      COUCHBASE_BUCKET_PASSWORD: password
+    depends_on:
+      - couchbase
+      - kafka
+

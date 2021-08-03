@@ -2,6 +2,7 @@ package com.ty.basketmicroservice.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.ty.basketmicroservice.dto.AddItemRequest;
+import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
 import com.ty.basketmicroservice.model.Basket;
 import com.ty.basketmicroservice.service.BasketServiceV1;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,11 +41,13 @@ class BasketControllerTest {
                 .basketId(BASKET_ID).sessionId(SESSION_ID)
                 .productId(PRODUCT_ID).productPrice(GENERIC_PRICE)
                 .productImage("str").productInfo("str").build();
-        String requestString = request.toString();
 
+        this.mockMvc.perform(post("http://localhost:8080/basket/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSON.toJSONString(request))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-        //this.mockMvc.perform(post("http://localhost:8080/basket/", JSON.toJSONString(requestString))).andExpect(status().isOk());
-        //this.mockMvc.perform(post("http://localhost:8081/basket/", request.toString())).andExpect(status().isOk());
     }
 
 
@@ -51,9 +55,51 @@ class BasketControllerTest {
     void increaseQuantity() throws Exception {
         ItemRequest request = ItemRequest.builder().basketId(BASKET_ID).productId(PRODUCT_ID).build();
 
-        //JSON.toJSONString(request);
-
-        //this.mockMvc.perform(put("/basket/increase", request)).andExpect(status().isOk());
+        this.mockMvc.perform(put("/basket/increase")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSON.toJSONString(request)))
+                .andExpect(status().isOk());
     }
+
+    @Test
+    void decreaseQuantity() throws Exception {
+        ItemRequest request = ItemRequest.builder().basketId(BASKET_ID).productId(PRODUCT_ID).build();
+
+        this.mockMvc.perform(put("/basket/decrease")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSON.toJSONString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void removeItem() throws Exception {
+        ItemRequest request = ItemRequest.builder().basketId(BASKET_ID).productId(PRODUCT_ID).build();
+
+        this.mockMvc.perform(put("/basket/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSON.toJSONString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void changeCheckBox() throws Exception {
+        ItemRequest request = ItemRequest.builder().basketId(BASKET_ID).productId(PRODUCT_ID).build();
+
+        this.mockMvc.perform(put("/basket/checkbox")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSON.toJSONString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void changeQuantity() throws Exception {
+        ChangeQuantityRequest request = ChangeQuantityRequest.builder().basketId(BASKET_ID).productId(PRODUCT_ID).quantity(4).build();
+
+        this.mockMvc.perform(put("/basket/change")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSON.toJSONString(request)))
+                .andExpect(status().isOk());
+    }
+
 
 }

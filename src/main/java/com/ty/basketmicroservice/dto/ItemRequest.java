@@ -11,5 +11,11 @@ public class ItemRequest {
     private String basketId;
     private Long productId;
 
-
+    @Override
+    public String toString() {
+        return "{" +
+                "basketId=\"" + basketId + '\"' +
+                ", productId=" + productId +
+                '}';
+    }
 }

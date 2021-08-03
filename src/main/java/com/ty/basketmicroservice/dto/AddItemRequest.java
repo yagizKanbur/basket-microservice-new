@@ -18,7 +18,7 @@ public class AddItemRequest {
     @Override
     public String toString() {
         return "AddItemRequest{" +
-                "basketId=" + basketId +
+                "basketId='" + basketId + '\'' +
                 ", sessionId=" + sessionId +
                 ", productId=" + productId +
                 ", productImage='" + productImage + '\'' +

@@ -13,5 +13,5 @@ docker exec -t $container couchbase-cli bucket-create -c localhost -u Administra
   --bucket basket --bucket-type couchbase --bucket-ramsize 1024
 
 docker exec -t $container couchbase-cli user-manage -c localhost -u Administrator -p password \
-  --set --rbac-username yagiz --rbac-name yagiz --rbac-password opensesame --roles admin \
+  --set --rbac-username Administrator --rbac-name Administrator --rbac-password password --roles admin \
   --auth-domain local
