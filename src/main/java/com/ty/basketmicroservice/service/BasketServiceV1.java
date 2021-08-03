@@ -13,12 +13,14 @@ import com.ty.basketmicroservice.enums.BasketStatus;
 import com.ty.basketmicroservice.repository.BasketRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -105,7 +107,6 @@ public class BasketServiceV1 implements BasketService {
 
     @Override
     public Basket addItem(AddItemRequest request) {
-        // Todo: Create basket if there is no basket id in the request
         if(request.getProductPrice() <= 0){
             throw new NegativePriceException();
         }
@@ -186,7 +187,7 @@ public class BasketServiceV1 implements BasketService {
     }
 
     @Override
-    public Basket completeOrder(Long basketId) {
+    public Basket completeOrder(String basketId) {
         Optional<Basket> optionalBasket = basketRepository.findById(basketId);
         if (optionalBasket.isEmpty()) {
             throw new BasketNotFoundException();
@@ -215,12 +216,26 @@ public class BasketServiceV1 implements BasketService {
     }
 
     private void mapRequestToBasket(Basket basket, AddItemRequest request){
-        basket.setId(request.getBasketId());
+        String uuid = generateBasketId();
+        basket.setBasketId(uuid);
         basket.setSessionId(request.getSessionId());
         basket.setItems(new HashMap<>());
         basket.setStatus(BasketStatus.PENDING);
         Date date = new Date();
         basket.setCreationDate(date.getTime());
+    }
+
+    public String generateBasketId(){
+        boolean flag = true;
+        String uuid = null;
+        while(flag){
+            uuid = String.valueOf(UUID.randomUUID());
+            Optional<Basket> optionalBasket =  basketRepository.findById(uuid);
+            if(optionalBasket.isEmpty()){
+                flag = false;
+            }
+        }
+        return uuid;
     }
 
     private void mapRequestToItem(BasketItem item, AddItemRequest request){
@@ -244,7 +259,7 @@ public class BasketServiceV1 implements BasketService {
     }
 
     private boolean compareAddItemRequestWithBasket(AddItemRequest request, Basket basket) {
-        if (!basket.getId().equals(request.getBasketId())) {
+        if (!basket.getBasketId().equals(request.getBasketId())) {
             return false;
         }
         if (!basket.getSessionId().equals(request.getSessionId())) {

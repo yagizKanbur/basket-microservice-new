@@ -30,7 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 class BasketServiceV1Test {
 
-    private static final Long BASKET_ID = 1L;
+    private static final String BASKET_ID = "a9ef89a7-bbf4-4cd9-9b22-85b90d6e147d";
     private static final Long PRODUCT_ID = 1L;
     private static final int QUANTITY = 3;
     private static final int INCREASED_QUANTITY = 4;
@@ -52,7 +52,7 @@ class BasketServiceV1Test {
 
     Basket prepareAndGetBasket(BasketStatus status){
         Basket basket = new Basket();
-        basket.setId(BASKET_ID);
+        basket.setBasketId(BASKET_ID);
         basket.setStatus(status);
         basket.setItems(new HashMap<>());
 

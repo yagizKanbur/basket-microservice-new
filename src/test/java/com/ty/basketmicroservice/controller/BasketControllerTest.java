@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = BasketController.class)
 @ActiveProfiles("test")
 class BasketControllerTest {
-    private static final Long BASKET_ID = 1001L;
+    private static final String BASKET_ID = "a9ef89a7-bbf4-4cd9-9b22-85b90d6e147d";
     private static final Long SESSION_ID = 10001L;
     private static final Long PRODUCT_ID = 10001L;
     private static final Double GENERIC_PRICE = 4.00;

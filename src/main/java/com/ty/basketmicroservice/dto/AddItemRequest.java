@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class AddItemRequest {
-    private Long basketId;
+    private String basketId;
     private Long sessionId;
     private Long productId;
     private String productImage;

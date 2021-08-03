@@ -3,6 +3,8 @@ package com.ty.basketmicroservice.model;
 import com.ty.basketmicroservice.enums.BasketItemStatus;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.Field;
 
@@ -19,6 +21,8 @@ public class BasketInfo {
     private Double totalPrice;
     @Field
     private boolean isFreeShipping;
+
+    @Autowired
 
     public BasketInfo() {
         sumOfShippingPrices = 12.00;

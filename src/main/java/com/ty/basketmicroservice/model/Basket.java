@@ -19,7 +19,7 @@ import java.util.*;
 @Setter
 public class Basket {
     @Id @GeneratedValue(strategy = GenerationStrategy.UNIQUE)
-    private Long id;
+    private String basketId;
     @Field
     private Long sessionId;
     @Field
@@ -35,7 +35,7 @@ public class Basket {
     }
 
     public Basket(AddItemRequest request) {
-        this.id = request.getBasketId();
+        this.basketId = request.getBasketId();
         this.sessionId = request.getSessionId();
         this.items = new HashMap<>();
         this.info = new BasketInfo();

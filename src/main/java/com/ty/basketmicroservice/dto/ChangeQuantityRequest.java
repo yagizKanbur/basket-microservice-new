@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ChangeQuantityRequest {
-    private Long basketId;
+    private String basketId;
     private Long productId;
     private int quantity;
 

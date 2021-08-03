@@ -45,7 +45,7 @@ public class BasketController {
     }
 
     @PutMapping("/order")
-    public ResponseEntity<?> completeOrder(@RequestBody Long basketId) {
+    public ResponseEntity<?> completeOrder(@RequestBody String basketId) {
         return ResponseEntity.ok(basketService.completeOrder(basketId));
     }
 }
