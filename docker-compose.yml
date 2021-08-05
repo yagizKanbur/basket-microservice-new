@@ -1,3 +1,4 @@
+
 version: '3.8'
 services:
   zookeeper:
@@ -20,28 +21,23 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       ALLOW_PLAINTEXT_LISTENER: 'yes'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-      KAFKA_CREATE_TOPICS: "product.update:3:1,product.create:3:1,notification:3:1"
+      KAFKA_CREATE_TOPICS: "basket.update:3:1,basket.create:3:1,basket.order:3:1,product.notification:3:1"
     depends_on:
-      - zookeeper
-    links:
       - zookeeper
 
   # run the setup.sh script
-  couchbase2:
+  couchbase:
     image: couchbase:latest
     restart: always
     ports:
       - 8091-8094:8091-8094
       - 11210-11211:11210-11211
 
-  basket-microservice:
+  basket-microservice-new:
     build: .
     ports:
       - 8085:8085
     restart: always
     depends_on:
-      - couchbase2
-      - kafka
-    links:
-      - couchbase2
+      - couchbase
       - kafka
