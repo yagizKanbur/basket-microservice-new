@@ -27,6 +27,7 @@ class BasketControllerTest {
     private static final Long SESSION_ID = 10001L;
     private static final Long PRODUCT_ID = 10001L;
     private static final Double GENERIC_PRICE = 4.00;
+    private static final int QUANTITY = 3;
 
 
     @Autowired
@@ -93,7 +94,7 @@ class BasketControllerTest {
 
     @Test
     void changeQuantity() throws Exception {
-        ChangeQuantityRequest request = ChangeQuantityRequest.builder().basketId(BASKET_ID).productId(PRODUCT_ID).quantity(4).build();
+        ChangeQuantityRequest request = ChangeQuantityRequest.builder().basketId(BASKET_ID).productId(PRODUCT_ID).quantity(QUANTITY).build();
 
         this.mockMvc.perform(put("/basket/change")
                 .contentType(MediaType.APPLICATION_JSON)

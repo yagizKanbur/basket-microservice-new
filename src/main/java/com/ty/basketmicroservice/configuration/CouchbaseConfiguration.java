@@ -5,7 +5,7 @@ import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration;
 
 @Configuration
 public class CouchbaseConfiguration extends AbstractCouchbaseConfiguration {
-    private static final String CONNECTION_STRING = "localhost";
+    private static final String CONNECTION_STRING = "couchbase";
     private static final String USERNAME = "Administrator";
     private static final String PASSWORD = "password";
     private static final String BUCKET_NAME = "basket";
