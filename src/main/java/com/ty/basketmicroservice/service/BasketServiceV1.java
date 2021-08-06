@@ -1,6 +1,7 @@
 package com.ty.basketmicroservice.service;
 
 import com.alibaba.fastjson.JSON;
+import com.ty.basketmicroservice.dto.ItemEvent;
 import com.ty.basketmicroservice.enums.BasketItemStatus;
 import com.ty.basketmicroservice.exceptions.*;
 import com.ty.basketmicroservice.model.Basket;
@@ -41,7 +42,7 @@ public class BasketServiceV1 implements BasketService {
     private Double shippingThreshold;
 
     private final BasketRepository basketRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, ItemEvent> kafkaTemplate;
 
     @Override
     public Basket increaseQuantity(ItemRequest request) {
@@ -123,7 +124,11 @@ public class BasketServiceV1 implements BasketService {
 
         if (optionalBasket.isEmpty() || BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             Basket createdBasket = createBasket(request);
-            //kafkaTemplate.send(CREATE_TOPIC, JSON.toJSONString(createdBasket, false));
+            ItemEvent itemEvent = ItemEvent.builder()
+                    .basketId(createdBasket.getBasketId())
+                    .productId(request.getProductId())
+                    .userId(createdBasket.getSessionId()).build();
+            kafkaTemplate.send(CREATE_TOPIC, itemEvent);
             return basketRepository.save(createdBasket);
         }
 
@@ -151,7 +156,11 @@ public class BasketServiceV1 implements BasketService {
         mapRequestToItem(item,request);
 
         basket.addItem(item);
-        //kafkaTemplate.send(CREATE_TOPIC, JSON.toJSONString(basket, false));
+        ItemEvent itemEvent  = ItemEvent.builder()
+                .basketId(basket.getBasketId())
+                .userId(basket.getSessionId())
+                .productId(item.getProductId()).build();
+        kafkaTemplate.send(CREATE_TOPIC, itemEvent);
         return basketRepository.save(basket);
     }
 
@@ -171,7 +180,11 @@ public class BasketServiceV1 implements BasketService {
         BasketItem item = getItemFromBasket(basket, request.getProductId());
 
         basket.removeItem(item);
-        //kafkaTemplate.send(UPDATE_TOPIC, JSON.toJSONString(basket, false));
+        ItemEvent itemEvent  = ItemEvent.builder()
+                .basketId(basket.getBasketId())
+                .userId(basket.getSessionId())
+                .productId(item.getProductId()).build();
+        kafkaTemplate.send(UPDATE_TOPIC,itemEvent);
         return basketRepository.save(basket);
     }
 
