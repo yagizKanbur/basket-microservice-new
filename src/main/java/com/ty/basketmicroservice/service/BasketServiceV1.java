@@ -185,7 +185,7 @@ public class BasketServiceV1 implements BasketService {
                 .basketId(basket.getId())
                 .userId(basket.getUserId())
                 .productId(item.getProductId()).build();
-        //kafkaTemplate.send(UPDATE_TOPIC,itemEvent);
+        kafkaTemplate.send(UPDATE_TOPIC,itemEvent);
         log.info(JSON.toJSONString(itemEvent));
         return basketRepository.save(basket);
     }
@@ -220,7 +220,7 @@ public class BasketServiceV1 implements BasketService {
         }
         Basket basket = optionalBasket.get();
         basket.setStatus(BasketStatus.ORDERED);
-        //kafkaTemplate.send(ORDER_TOPIC, JSON.toJSONString(basket, false));
+       //kafkaTemplate.send(ORDER_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
 

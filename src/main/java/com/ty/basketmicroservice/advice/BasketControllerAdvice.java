@@ -25,19 +25,22 @@ public class BasketControllerAdvice {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler(BasketNotFoundException.class)
+    @ExceptionHandler(BasketException.class)
+    public ResponseEntity<String> handleBasketException (BasketException e){
+        log.info(e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(BasketNotFoundException.class) //
     public ResponseEntity<?> handleBasketNotFound(BasketNotFoundException e) {
         log.info(e.getMessage());
         return new ResponseEntity<>(e.getMessage(),e.getHttpStatus());
-        //return ResponseEntity.notFound().eTag(e.getMessage()).build();
-        // return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(ItemNotFoundException.class)
     public ResponseEntity<String> handleItemNotFound(ItemNotFoundException e) {
         log.info(e.getMessage());
         return new ResponseEntity<>(e.getMessage(),e.getHttpStatus());
-        //return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(KafkaException.class)
@@ -52,6 +55,9 @@ public class BasketControllerAdvice {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
+    //  Handling basket exception now
+
+    /*
     @ExceptionHandler(RequestMismatchedWithBasketDataException.class)
     public ResponseEntity<String> handleRequestMismatchedWithBasketData (RequestMismatchedWithBasketDataException e){
         log.info(e.getMessage());
@@ -67,6 +73,7 @@ public class BasketControllerAdvice {
     @ExceptionHandler(NegativePriceException.class)
     public ResponseEntity<String> handleNegativePriceException (NegativePriceException e){
         return ResponseEntity.badRequest().body(e.getMessage());
-    }
+    } */
+
 
 }
