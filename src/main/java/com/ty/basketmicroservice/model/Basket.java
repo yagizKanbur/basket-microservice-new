@@ -3,9 +3,7 @@ package com.ty.basketmicroservice.model;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.enums.BasketItemStatus;
 import com.ty.basketmicroservice.enums.BasketStatus;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.Field;
@@ -19,9 +17,9 @@ import java.util.*;
 @Setter
 public class Basket {
     @Id @GeneratedValue(strategy = GenerationStrategy.UNIQUE)
-    private String basketId;
+    private String id;
     @Field
-    private Long sessionId;
+    private Long userId;
     @Field
     private Map<Long, BasketItem> items;
     @Field
@@ -31,7 +29,8 @@ public class Basket {
     @Field
     private BasketStatus status;
 
-    public Basket() {
+    public Basket(){
+
     }
 
     public Map<Long, BasketItem> getItems() {
@@ -39,7 +38,7 @@ public class Basket {
         return items;
     }
 
-    public void changeBasketStatus() {
+    public void changeBasketStatus() { // Todo: Maybe no need for this method instead use setBasketStatus
         if (this.status == BasketStatus.PENDING) {
             this.status = BasketStatus.ORDERED;
         } else if (this.status == BasketStatus.ORDERED) {
@@ -47,13 +46,13 @@ public class Basket {
         }
     }
 
-    public void addItem(BasketItem item) {
-        this.getItems().putIfAbsent(item.getProductId(), item);
+    public void addItem(BasketItem item) { // Todo: Should I check if item is in the hash map here instead checking it in the service layer
+        this.items.putIfAbsent(item.getProductId(), item);
         this.info.calculatePrice(item);
     }
 
-    public void removeItem(BasketItem item) {
-        this.getItems().remove(item.getProductId());
+    public void removeItem(BasketItem item) { // Todo: Should I check if item is in the hash map here instead checking it in the service layer
+        this.items.remove(item.getProductId());
         this.info.calculatePriceAfterRemovingItem(item);
     }
 

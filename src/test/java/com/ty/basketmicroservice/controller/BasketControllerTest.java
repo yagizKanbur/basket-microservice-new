@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
-import com.ty.basketmicroservice.model.Basket;
 import com.ty.basketmicroservice.service.BasketServiceV1;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(controllers = BasketController.class)
@@ -39,7 +37,7 @@ class BasketControllerTest {
     @Test
     void addItem() throws Exception {
         AddItemRequest request = AddItemRequest.builder()
-                .basketId(BASKET_ID).sessionId(SESSION_ID)
+                .basketId(BASKET_ID).userId(SESSION_ID)
                 .productId(PRODUCT_ID).productPrice(GENERIC_PRICE)
                 .productImage("str").productInfo("str").build();
 

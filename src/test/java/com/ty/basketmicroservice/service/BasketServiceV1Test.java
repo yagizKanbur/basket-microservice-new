@@ -1,6 +1,5 @@
 package com.ty.basketmicroservice.service;
 
-import com.ty.basketmicroservice.dto.AddItemRequest;
 import com.ty.basketmicroservice.dto.ChangeQuantityRequest;
 import com.ty.basketmicroservice.dto.ItemRequest;
 import com.ty.basketmicroservice.enums.BasketStatus;
@@ -54,7 +53,7 @@ class BasketServiceV1Test {
 
     Basket prepareAndGetBasket(BasketStatus status){
         Basket basket = new Basket();
-        basket.setBasketId(BASKET_ID);
+        basket.setId(BASKET_ID);
         basket.setStatus(status);
         basket.setItems(new HashMap<>());
 

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.Field;
 
+import java.util.Objects;
+
 @Document
 @Getter
 @Setter
@@ -22,8 +24,8 @@ public class BasketInfo {
     @Field
     private boolean isFreeShipping;
 
-    private Double shippingPrice;
-    private Double shippingThreshold;
+    private transient Double shippingPrice;
+    private transient Double shippingThreshold;
 
     public BasketInfo(Double shippingPrice, Double shippingThreshold) {
         this.shippingPrice = shippingPrice;
@@ -39,8 +41,8 @@ public class BasketInfo {
 
     //*************************************************************************
 
-    public void calculatePrice(BasketItem item) {
-        if (this.getSumOfProductPrices() == null) {
+    public void calculatePrice(BasketItem item) { // Todo:
+        if (Objects.isNull(sumOfProductPrices)) {
             this.setSumOfProductPrices(item.getProductPrice());
         } else {
             Double newPrice = item.getProductPrice() + this.getSumOfProductPrices();

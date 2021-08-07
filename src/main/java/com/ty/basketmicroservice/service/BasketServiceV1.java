@@ -14,10 +14,8 @@ import com.ty.basketmicroservice.enums.BasketStatus;
 import com.ty.basketmicroservice.repository.BasketRepository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +26,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasketServiceV1 implements BasketService {
     private static final String UPDATE_TOPIC = "basket.update";
     private static final String CREATE_TOPIC = "basket.create";
@@ -125,10 +124,11 @@ public class BasketServiceV1 implements BasketService {
         if (optionalBasket.isEmpty() || BasketStatus.ORDERED.equals(optionalBasket.get().getStatus())) {
             Basket createdBasket = createBasket(request);
             ItemEvent itemEvent = ItemEvent.builder()
-                    .basketId(createdBasket.getBasketId())
+                    .basketId(createdBasket.getId())
                     .productId(request.getProductId())
-                    .userId(createdBasket.getSessionId()).build();
+                    .userId(createdBasket.getUserId()).build();
             kafkaTemplate.send(CREATE_TOPIC, itemEvent);
+            log.info(JSON.toJSONString(itemEvent));
             return basketRepository.save(createdBasket);
         }
 
@@ -157,10 +157,11 @@ public class BasketServiceV1 implements BasketService {
 
         basket.addItem(item);
         ItemEvent itemEvent  = ItemEvent.builder()
-                .basketId(basket.getBasketId())
-                .userId(basket.getSessionId())
+                .basketId(basket.getId())
+                .userId(basket.getUserId())
                 .productId(item.getProductId()).build();
         kafkaTemplate.send(CREATE_TOPIC, itemEvent);
+        log.info(JSON.toJSONString(itemEvent));
         return basketRepository.save(basket);
     }
 
@@ -181,10 +182,11 @@ public class BasketServiceV1 implements BasketService {
 
         basket.removeItem(item);
         ItemEvent itemEvent  = ItemEvent.builder()
-                .basketId(basket.getBasketId())
-                .userId(basket.getSessionId())
+                .basketId(basket.getId())
+                .userId(basket.getUserId())
                 .productId(item.getProductId()).build();
-        kafkaTemplate.send(UPDATE_TOPIC,itemEvent);
+        //kafkaTemplate.send(UPDATE_TOPIC,itemEvent);
+        log.info(JSON.toJSONString(itemEvent));
         return basketRepository.save(basket);
     }
 
@@ -217,7 +219,7 @@ public class BasketServiceV1 implements BasketService {
             throw new BasketAlreadyOrderedException();
         }
         Basket basket = optionalBasket.get();
-        basket.changeBasketStatus();
+        basket.setStatus(BasketStatus.ORDERED);
         //kafkaTemplate.send(ORDER_TOPIC, JSON.toJSONString(basket, false));
         return basketRepository.save(basket);
     }
@@ -238,8 +240,8 @@ public class BasketServiceV1 implements BasketService {
 
     private void mapRequestToBasket(Basket basket, AddItemRequest request){
         String uuid = generateBasketId();
-        basket.setBasketId(uuid);
-        basket.setSessionId(request.getSessionId());
+        basket.setId(uuid);
+        basket.setUserId(request.getUserId());
         basket.setItems(new HashMap<>());
         basket.setStatus(BasketStatus.PENDING);
         Date date = new Date();
@@ -280,10 +282,10 @@ public class BasketServiceV1 implements BasketService {
     }
 
     private boolean compareAddItemRequestWithBasket(AddItemRequest request, Basket basket) {
-        if (!basket.getBasketId().equals(request.getBasketId())) {
+        if (!basket.getId().equals(request.getBasketId())) {
             return false;
         }
-        if (!basket.getSessionId().equals(request.getSessionId())) {
+        if (!basket.getUserId().equals(request.getUserId())) {
             return false;
         }
         return true;

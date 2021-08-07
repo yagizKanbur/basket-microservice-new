@@ -38,10 +38,10 @@ public class BasketItem {
     }
 
     public void decreaseQuantity() {
-        this.quantity--;
+        quantity--;
     }
 
-    public void reverseBasketItemStatus() {
+    public void reverseBasketItemStatus() { // Todo : set status with set status method
         if (this.status == BasketItemStatus.CHECKED) {
             this.status = BasketItemStatus.UNCHECKED;
         } else {

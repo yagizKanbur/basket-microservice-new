@@ -9,7 +9,7 @@ import lombok.Setter;
 @Builder
 public class AddItemRequest {
     private String basketId;
-    private Long sessionId;
+    private Long userId;
     private Long productId;
     private String productImage;
     private String productInfo;
@@ -19,7 +19,7 @@ public class AddItemRequest {
     public String toString() {
         return "AddItemRequest{" +
                 "basketId='" + basketId + '\'' +
-                ", sessionId=" + sessionId +
+                ", sessionId=" + userId +
                 ", productId=" + productId +
                 ", productImage='" + productImage + '\'' +
                 ", productInfo='" + productInfo + '\'' +
